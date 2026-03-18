@@ -4,25 +4,35 @@ import org.junit.Test;
 import org.ulpgc.dacd.model.NewsArticle;
 
 import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
 public class MarcaRssScraperTest {
 
     @Test
-    public void shouldReturnArticlesForRealMadrid() {
+    public void shouldReturnArticlesForAllTeams() {
         NewsScraper scraper = new MarcaRssScraper();
-        String team = "Real Madrid";
+        List<String> teams = Arrays.asList(
+                "Real Madrid CF", "FC Barcelona", "Real Betis Balompié", "Sevilla FC",
+                "Real Sociedad de Fútbol", "Athletic Club", "UD Las Palmas", "CD Tenerife"
+        );
 
-        List<NewsArticle> articles = scraper.scrape(team);
+        for (String team : teams) {
+            List<NewsArticle> articles = scraper.scrape(team);
+            if (team.equals("CD Tenerife")) {
+                assertTrue(articles.isEmpty());
+                continue;
+            }
 
-        assertNotNull(articles);
-        assertFalse(articles.isEmpty());
+            assertNotNull(articles);
+            assertFalse(articles.isEmpty());
 
-        NewsArticle firstArticle = articles.getFirst();
-        assertNotNull(firstArticle.title());
-        assertFalse(firstArticle.title().isBlank());
-        assertEquals("Marca", firstArticle.source());
-        assertEquals(team, firstArticle.team());
+            NewsArticle firstArticle = articles.getFirst();
+            assertNotNull(firstArticle.title());
+            assertFalse(firstArticle.title().isBlank());
+            assertEquals("Marca", firstArticle.source());
+            assertEquals(team, firstArticle.team());
+        }
     }
 }
