@@ -1,9 +1,11 @@
 package org.ulpgc.dacd.model;
 
+import java.time.Instant;
+
 public record NewsArticle(
         String title,
         String link,
-        String date,
+        Instant date,
         String source,
         String team
 ) {
