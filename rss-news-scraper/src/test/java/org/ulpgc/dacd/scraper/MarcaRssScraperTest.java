@@ -20,13 +20,9 @@ public class MarcaRssScraperTest {
 
         for (String team : teams) {
             List<NewsArticle> articles = scraper.scrape(team);
-            if (team.equals("CD Tenerife")) {
-                assertTrue(articles.isEmpty());
-                continue;
-            }
 
             assertNotNull(articles);
-            assertFalse(articles.isEmpty());
+            assertFalse("Debería haber noticias en Marca para " + team, articles.isEmpty());
 
             NewsArticle firstArticle = articles.getFirst();
             assertNotNull(firstArticle.title());

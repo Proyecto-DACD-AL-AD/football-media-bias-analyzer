@@ -23,18 +23,18 @@ public class MarcaRssScraper implements NewsScraper {
             "Sevilla FC", "sevilla",
             "Real Sociedad de Fútbol", "real-sociedad",
             "Athletic Club", "athletic",
-            "UD Las Palmas", "las-palmas"
+            "UD Las Palmas", "las-palmas",
+            "CD Tenerife", "tenerife"
     );
 
     @Override
     public List<NewsArticle> scrape(String teamName) {
         List<NewsArticle> articles = new ArrayList<>();
-        String url = String.format(BASE_URL, formatTeamName(teamName));
+        String teamSlug = TEAM_URL_NAMES.get(teamName);
 
-        if (teamName.equalsIgnoreCase("CD Tenerife")) {
-            System.out.println("Aviso: Marca no provee RSS para " + teamName);
-            return articles;
-        }
+        if (teamSlug == null) return articles;
+
+        String url = String.format(BASE_URL, teamSlug);
 
         try {
             Document doc = Jsoup.connect(url).get();
@@ -48,10 +48,6 @@ public class MarcaRssScraper implements NewsScraper {
         }
 
         return articles;
-    }
-
-    private String formatTeamName(String teamName) {
-        return TEAM_URL_NAMES.getOrDefault(teamName, teamName.toLowerCase().replace(" ", "-"));
     }
 
     private NewsArticle parseArticle(Element item, String teamName) {
