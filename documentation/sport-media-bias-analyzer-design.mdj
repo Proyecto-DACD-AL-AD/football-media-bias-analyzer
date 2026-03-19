@@ -789,7 +789,7 @@
 											"top": 407,
 											"width": 96.1162109375,
 											"height": 13,
-											"text": "AssRssScraper"
+											"text": "AsRssScraper"
 										},
 										{
 											"_type": "LabelView",
@@ -1201,7 +1201,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "AssRssScraper",
+					"name": "AsRssScraper",
 					"ownedElements": [
 						{
 							"_type": "UMLInterfaceRealization",
