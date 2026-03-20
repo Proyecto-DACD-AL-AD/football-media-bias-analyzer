@@ -36,3 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Ignorar bases de datos locales pero mantener la carpeta
+database/*.db
