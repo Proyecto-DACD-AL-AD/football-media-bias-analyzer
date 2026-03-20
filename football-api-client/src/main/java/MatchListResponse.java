@@ -4,7 +4,7 @@ import java.util.List;
 public class MatchListResponse {
 
     @SerializedName("matches")
-    List<MatchResponse> matches;
+    private List<MatchResponse> matches;
 
     public List<MatchResponse> getMatches() {
         return matches;

@@ -10,7 +10,7 @@ public class Main {
         try {
             String rawJson = apiClient.getAllMatches();
             List<MatchResponse> matchesToSave = matchFilter.filterMatches(rawJson);
-            matchFilter.filterMatches(rawJson);
+
 
         } catch (Exception e) {
             System.out.println("Error en el proceso: " + e.getMessage());

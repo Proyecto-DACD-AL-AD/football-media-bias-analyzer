@@ -9,7 +9,7 @@ public class FootballApiClient {
 
     private static final String API_TOKEN = "b16a3ee0850b41b7b3bc5ee95b7061dc";
     private static final String API_URL = "https://api.football-data.org/v4/competitions/2014/matches?season=2025";
-    HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client = HttpClient.newHttpClient();
 
 
     public String getAllMatches() throws IOException, InterruptedException {
