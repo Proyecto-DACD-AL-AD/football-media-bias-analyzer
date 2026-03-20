@@ -12,6 +12,7 @@ public class Main {
             String rawJson = apiClient.getAllMatches();
             List<MatchResponse> matchesToSave = matchFilter.filterMatches(rawJson);
             databaseManager.createTable();
+            databaseManager.insertMatches(matchesToSave);
 
 
 

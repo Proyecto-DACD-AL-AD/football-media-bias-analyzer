@@ -1,7 +1,5 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.List;
 
 public class FootballDatabaseManager {
 
@@ -32,6 +30,31 @@ public class FootballDatabaseManager {
 
         } catch (SQLException e) {
             System.out.println("Error al crear la tabla: " + e.getMessage());
+        }
+    }
+
+    public void insertMatches(List<MatchResponse> matches) {
+
+        String sql = "INSERT INTO matches (home_team, away_team, home_goals, away_goals, status, match_date) " +
+                "VALUES (?, ?, ?, ?, ?, ?);";
+
+        try (Connection connection = connect();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            for (MatchResponse match : matches) {
+                preparedStatement.setString(1, match.getHomeTeam().getName());
+                preparedStatement.setString(2, match.getAwayTeam().getName());
+                preparedStatement.setInt(3, match.getScore().getFullTime().getHomeGoals());
+                preparedStatement.setInt(4, match.getScore().getFullTime().getAwayGoals());
+                preparedStatement.setString(5, match.getStatus());
+                preparedStatement.setString(6, match.getDate());
+
+                preparedStatement.executeUpdate();
+            }
+            System.out.println("Partidos insertados correctamente.");
+
+        } catch (SQLException e) {
+            System.out.println("Error al insertar partidos: " + e.getMessage());
         }
     }
 }
