@@ -3,9 +3,9 @@ import com.google.gson.annotations.SerializedName;
 public class Score {
 
     @SerializedName("fullTime")
-    private FullTime score;
+    private FullTime fullTime;
 
-    public FullTime getScore() {
-        return score;
+    public FullTime getFullTime() {
+        return fullTime;
     }
 }

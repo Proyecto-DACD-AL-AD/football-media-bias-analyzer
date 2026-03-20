@@ -1,0 +1,20 @@
+import java.util.List;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        FootballApiClient apiClient = new FootballApiClient();
+        FootballMatchFilter matchFilter = new FootballMatchFilter();
+
+        try {
+            String rawJson = apiClient.getAllMatches();
+            List<MatchResponse> matchesToSave = matchFilter.filterMatches(rawJson);
+            matchFilter.filterMatches(rawJson);
+
+        } catch (Exception e) {
+            System.out.println("Error en el proceso: " + e.getMessage());
+        }
+
+    }
+}
