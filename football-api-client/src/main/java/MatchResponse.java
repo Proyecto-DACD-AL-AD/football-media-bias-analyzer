@@ -20,6 +20,8 @@ public class MatchResponse {
     @SerializedName("matchday")
     private int matchday;
 
+    private Integer homeRankAfterMatchday;
+    private Integer awayRankAfterMatchday;
 
     public String getStatus() {
         return status;
@@ -43,5 +45,21 @@ public class MatchResponse {
 
     public int getMatchday() {
         return matchday;
+    }
+
+    public Integer getHomeRankAfterMatchday() {
+        return homeRankAfterMatchday;
+    }
+
+    public void setHomeRankAfterMatchday(Integer homeRankAfterMatchday) {
+        this.homeRankAfterMatchday = homeRankAfterMatchday;
+    }
+
+    public Integer getAwayRankAfterMatchday() {
+        return awayRankAfterMatchday;
+    }
+
+    public void setAwayRankAfterMatchday(Integer awayRankAfterMatchday) {
+        this.awayRankAfterMatchday = awayRankAfterMatchday;
     }
 }
