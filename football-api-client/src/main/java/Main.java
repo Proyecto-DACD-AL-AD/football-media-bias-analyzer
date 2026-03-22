@@ -24,7 +24,7 @@ public class Main {
                 standingsMap.put(matchday, matchFilter.parseStandings(jsonStandings));
 
 
-                Thread.sleep(6500);
+                Thread.sleep(6000);
             }
 
 

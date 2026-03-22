@@ -22,7 +22,8 @@ public class FootballDatabaseManager {
                 "away_rank_after_matchday INTEGER,\n" +
                 "status TEXT,\n" +
                 "match_date TEXT,\n" +
-                "captured_at TEXT DEFAULT CURRENT_TIMESTAMP" +
+                "captured_at TEXT DEFAULT CURRENT_TIMESTAMP," +
+                "UNIQUE(matchday, home_team, away_team)" +
                 ");";
 
         try (Connection connection = connect();
@@ -38,7 +39,7 @@ public class FootballDatabaseManager {
 
     public void insertMatches(List<MatchResponse> matches) {
 
-        String sqlInsert = "INSERT INTO matches (matchday, home_team, away_team, home_goals, away_goals, " +
+        String sqlInsert = "INSERT OR IGNORE INTO matches (matchday, home_team, away_team, home_goals, away_goals, " +
                 "home_rank_after_matchday, away_rank_after_matchday, status, match_date) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
