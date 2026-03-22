@@ -1,5 +1,8 @@
 import com.google.gson.Gson;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FootballMatchFilter {
 
@@ -35,16 +38,25 @@ public class FootballMatchFilter {
         }
     }
 
+    public Map<String, Integer> parseStandings(String standingsJson) {
+        Gson gson = new Gson();
 
+        StandingsResponse standingsResponse = gson.fromJson(standingsJson, StandingsResponse.class);
+        Map<String, Integer> standingsMap = new HashMap<>();
 
+        if (standingsResponse != null && standingsResponse.getStandings() != null) {
 
+            for (Standing standing : standingsResponse.getStandings()) {
+                if ("TOTAL".equals(standing.getType())) {
 
-
-
-
-
-
-
-
+                    for (TableEntry entry : standing.getTable()) {
+                        standingsMap.put(entry.getTeam().getName(), entry.getPosition());
+                    }
+                    break;
+                }
+            }
+        }
+        return standingsMap;
+    }
 
 }
