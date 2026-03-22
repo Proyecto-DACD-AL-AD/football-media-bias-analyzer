@@ -6,10 +6,14 @@ public class Main {
 
         FootballApiClient apiClient = new FootballApiClient();
         FootballMatchFilter matchFilter = new FootballMatchFilter();
+        FootballDatabaseManager databaseManager = new FootballDatabaseManager();
 
         try {
             String rawJson = apiClient.getAllMatches();
             List<MatchResponse> matchesToSave = matchFilter.filterMatches(rawJson);
+            databaseManager.createTable();
+            databaseManager.insertMatches(matchesToSave);
+
 
 
         } catch (Exception e) {
