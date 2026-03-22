@@ -20,8 +20,8 @@ public class MatchResponse {
     @SerializedName("matchday")
     private int matchday;
 
-    private int homeRankAfterMatchday;
-    private int awayRankAfterMatchday;
+    private Integer homeRankAfterMatchday;
+    private Integer awayRankAfterMatchday;
 
     public String getStatus() {
         return status;
