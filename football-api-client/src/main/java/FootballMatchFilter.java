@@ -6,10 +6,10 @@ import java.util.Map;
 
 public class FootballMatchFilter {
 
-    public List<MatchResponse> filterMatches(String rawJson) {
+    public List<MatchResponse> filterMatches(String allMatchesJson) {
 
         Gson gson = new Gson();
-        MatchListResponse matchList = gson.fromJson(rawJson, MatchListResponse.class);
+        MatchListResponse matchList = gson.fromJson(allMatchesJson, MatchListResponse.class);
         List<String> mediaTeams = List.of("Real Madrid CF", "FC Barcelona",
                 "Real Betis Balompié", "Sevilla FC", "Athletic Club", "Real Sociedad de Fútbol");
 
