@@ -17,6 +17,9 @@ public class MatchResponse {
     @SerializedName("score")
     private Score score;
 
+    @SerializedName("matchday")
+    private int matchday;
+
 
     public String getStatus() {
         return status;
@@ -36,5 +39,9 @@ public class MatchResponse {
 
     public Score getScore() {
         return score;
+    }
+
+    public int getMatchday() {
+        return matchday;
     }
 }
