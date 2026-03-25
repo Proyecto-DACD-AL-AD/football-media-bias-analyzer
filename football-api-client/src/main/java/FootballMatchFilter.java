@@ -6,7 +6,7 @@ public class FootballMatchFilter {
 
     public List<MatchResponse> filterMatches(String allMatchesJson) {
 
-        if (isJsonEmpty(rawJson)) return new ArrayList<>();
+        if (isJsonEmpty(allMatchesJson)) return new ArrayList<>();
 
         Gson gson = new Gson();
         MatchListResponse matchList = gson.fromJson(allMatchesJson, MatchListResponse.class);
