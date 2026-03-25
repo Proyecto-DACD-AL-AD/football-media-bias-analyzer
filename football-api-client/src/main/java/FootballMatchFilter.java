@@ -1,12 +1,12 @@
 import com.google.gson.Gson;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FootballMatchFilter {
 
     public List<MatchResponse> filterMatches(String rawJson) {
+
+        if (isJsonEmpty(rawJson)) return new ArrayList<>();
 
         Gson gson = new Gson();
         MatchListResponse matchList = gson.fromJson(rawJson, MatchListResponse.class);
@@ -22,6 +22,10 @@ public class FootballMatchFilter {
 
         printFilteredMatches(filteredMatches);
         return filteredMatches;
+    }
+
+    private static boolean isJsonEmpty(String rawJson) {
+        return rawJson.equals("{}");
     }
 
     private static void printFilteredMatches(List<MatchResponse> filteredMatches) {
