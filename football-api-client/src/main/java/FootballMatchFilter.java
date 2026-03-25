@@ -1,12 +1,15 @@
 import com.google.gson.Gson;
-import java.util.List;
+
+import java.util.*;
 
 public class FootballMatchFilter {
 
-    public List<MatchResponse> filterMatches(String rawJson) {
+    public List<MatchResponse> filterMatches(String allMatchesJson) {
+
+        if (isJsonEmpty(allMatchesJson)) return new ArrayList<>();
 
         Gson gson = new Gson();
-        MatchListResponse matchList = gson.fromJson(rawJson, MatchListResponse.class);
+        MatchListResponse matchList = gson.fromJson(allMatchesJson, MatchListResponse.class);
         List<String> mediaTeams = List.of("Real Madrid CF", "FC Barcelona",
                 "Real Betis Balompié", "Sevilla FC", "Athletic Club", "Real Sociedad de Fútbol");
 
@@ -19,6 +22,10 @@ public class FootballMatchFilter {
 
         printFilteredMatches(filteredMatches);
         return filteredMatches;
+    }
+
+    private static boolean isJsonEmpty(String rawJson) {
+        return rawJson.equals("{}");
     }
 
     private static void printFilteredMatches(List<MatchResponse> filteredMatches) {
@@ -35,16 +42,25 @@ public class FootballMatchFilter {
         }
     }
 
+    public Map<String, Integer> parseStandings(String standingsJson) {
+        Gson gson = new Gson();
 
+        StandingsResponse standingsResponse = gson.fromJson(standingsJson, StandingsResponse.class);
+        Map<String, Integer> standingsMap = new HashMap<>();
 
+        if (standingsResponse != null && standingsResponse.getStandings() != null) {
 
+            for (Standing standing : standingsResponse.getStandings()) {
+                if ("TOTAL".equals(standing.getType())) {
 
-
-
-
-
-
-
-
+                    for (TableEntry entry : standing.getTable()) {
+                        standingsMap.put(entry.getTeam().getName(), entry.getPosition());
+                    }
+                    break;
+                }
+            }
+        }
+        return standingsMap;
+    }
 
 }
