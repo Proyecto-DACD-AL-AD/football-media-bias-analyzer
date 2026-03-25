@@ -8,11 +8,11 @@ import java.sql.Statement;
 import java.time.Instant;
 import java.util.List;
 
-public class SqliteNewsRepository implements NewsRepository {
+public class DatabaseNewsSerializer implements NewsSerializer {
 
     private final String url;
 
-    public SqliteNewsRepository() {
+    public DatabaseNewsSerializer() {
         this.url = "jdbc:sqlite:database/sports_bias.db";
         initDatabase();
     }
@@ -37,7 +37,7 @@ public class SqliteNewsRepository implements NewsRepository {
     }
 
     @Override
-    public void save(List<NewsArticle> articles) {
+    public void serialize(List<NewsArticle> articles) {
         String sql = "INSERT OR IGNORE INTO news (title, link, pub_date, source, team, captured_at) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(url);
