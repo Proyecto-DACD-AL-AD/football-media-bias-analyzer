@@ -19,7 +19,7 @@ public class AsRssScraperTest {
         );
 
         for (String team : teams) {
-            List<NewsArticle> articles = scraper.scrape(team);
+            List<NewsArticle> articles = scraper.feed(team);
 
             assertNotNull(articles);
             assertFalse("Debería haber noticias en AS para " + team, articles.isEmpty());

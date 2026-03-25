@@ -26,7 +26,7 @@ public abstract class BaseRssScraper implements NewsScraper {
     }
 
     @Override
-    public final List<NewsArticle> scrape(String teamName) {
+    public final List<NewsArticle> feed(String teamName) {
         List<NewsArticle> articles = new ArrayList<>();
         String teamSlug = TEAM_URL_NAMES.get(teamName);
 

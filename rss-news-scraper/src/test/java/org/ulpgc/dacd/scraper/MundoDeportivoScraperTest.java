@@ -19,7 +19,7 @@ public class MundoDeportivoScraperTest {
         );
 
         for (String team : teams) {
-            List<NewsArticle> articles = scraper.scrape(team);
+            List<NewsArticle> articles = scraper.feed(team);
 
             assertNotNull(articles);
             assertFalse("Debería haber noticias en Mundo Deportivo para " + team, articles.isEmpty());
