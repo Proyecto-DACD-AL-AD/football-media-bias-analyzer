@@ -1,7 +1,7 @@
 import java.sql.*;
 import java.util.List;
 
-public class FootballDatabaseManager {
+public class FootballDatabaseManager implements FootballMatchSerializer{
 
     private static final String DB_PATH = "database/sports_bias.db";
 
