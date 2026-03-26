@@ -1,47 +1,24 @@
-import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        FootballApiClient apiClient = new FootballApiClient();
+        ApiFootballMatchFeeder apiFeeder = new ApiFootballMatchFeeder();
         FootballMatchFilter matchFilter = new FootballMatchFilter();
-        FootballDatabaseManager databaseManager = new FootballDatabaseManager();
+        DatabaseFootballMatchSerializer databaseSerializer = new DatabaseFootballMatchSerializer();
 
-        try {
+        Controller controller = new Controller(apiFeeder, matchFilter, databaseSerializer);
 
-            List<MatchResponse> matchesToSave = matchFilter.filterMatches(apiClient.getAllMatches());
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-            Set<Integer> matchdaySet = new HashSet<>();
-            for (MatchResponse matchToSave : matchesToSave) matchdaySet.add(matchToSave.getMatchday());
+        Runnable feedingTask = () -> {
+            System.out.println("\n--- Iniciando ciclo de actualización ---");
+            controller.start();
+        };
 
-
-            Map<Integer, Map<String, Integer>> standingsMap = new HashMap<>();
-
-            for (int matchday : matchdaySet) {
-                System.out.println("Pidiendo clasificación jornada " + matchday + "...");
-                String jsonStandings = apiClient.getStandingsByMatchday(matchday);
-                standingsMap.put(matchday, matchFilter.parseStandings(jsonStandings));
-
-
-                Thread.sleep(6000);
-            }
-
-
-            for (MatchResponse match : matchesToSave) {
-                Map<String, Integer> standingOfMatchday = standingsMap.get(match.getMatchday());
-                if (standingOfMatchday != null) {
-                    match.setHomeRankAfterMatchday(standingOfMatchday.get(match.getHomeTeam().getName()));
-                    match.setAwayRankAfterMatchday(standingOfMatchday.get(match.getAwayTeam().getName()));
-                }
-            }
-
-            databaseManager.createTable();
-            databaseManager.insertMatches(matchesToSave);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        scheduler.scheduleAtFixedRate(feedingTask, 0, 1, TimeUnit.HOURS);
     }
 }

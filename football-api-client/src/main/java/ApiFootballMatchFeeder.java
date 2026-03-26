@@ -5,9 +5,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 
-public class FootballApiClient {
+public class ApiFootballMatchFeeder implements FootballMatchFeeder {
 
-    private static final String API_TOKEN = "b16a3ee0850b41b7b3bc5ee95b7061dc";
+    private static final String API_TOKEN = System.getenv("API_TOKEN");
     private static final String BASE_URL = "https://api.football-data.org/v4/competitions/2014/";
     private final HttpClient client = HttpClient.newHttpClient();
 
@@ -16,6 +16,7 @@ public class FootballApiClient {
         String matchesUrl = BASE_URL + "matches?season=2025";
         return makeApiCall(matchesUrl);
     }
+
 
     public String getStandingsByMatchday (int matchday) throws IOException, InterruptedException {
         String standingsUrl = BASE_URL + "standings?season=2025&matchday=" + matchday;
