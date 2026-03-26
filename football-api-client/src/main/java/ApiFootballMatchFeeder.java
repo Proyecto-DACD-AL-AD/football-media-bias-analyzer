@@ -5,7 +5,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 
-public class FootballApiClient implements FootballMatchFeeder {
+public class ApiFootballMatchFeeder implements FootballMatchFeeder {
 
     private static final String API_TOKEN = "b16a3ee0850b41b7b3bc5ee95b7061dc";
     private static final String BASE_URL = "https://api.football-data.org/v4/competitions/2014/";

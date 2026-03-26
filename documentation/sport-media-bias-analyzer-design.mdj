@@ -5249,7 +5249,7 @@
 											"top": 871,
 											"width": 287,
 											"height": 13,
-											"text": "FootballApiClient"
+											"text": "ApiFootballMatchFeeder"
 										},
 										{
 											"_type": "LabelView",
@@ -7020,7 +7020,7 @@
 											"top": 887,
 											"width": 275,
 											"height": 13,
-											"text": "FootballDatabaseManager"
+											"text": "DatabaseFootballMatchSerializer"
 										},
 										{
 											"_type": "LabelView",
@@ -10785,7 +10785,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "FootballApiClient",
+					"name": "ApiFootballMatchFeeder",
 					"attributes": [
 						{
 							"_type": "UMLAttribute",
@@ -11349,7 +11349,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "FootballDatabaseManager",
+					"name": "DatabaseFootballMatchSerializer",
 					"attributes": [
 						{
 							"_type": "UMLAttribute",

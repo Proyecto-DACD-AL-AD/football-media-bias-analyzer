@@ -4,9 +4,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        FootballApiClient apiClient = new FootballApiClient();
+        ApiFootballMatchFeeder apiClient = new ApiFootballMatchFeeder();
         FootballMatchFilter matchFilter = new FootballMatchFilter();
-        FootballDatabaseManager databaseManager = new FootballDatabaseManager();
+        DatabaseFootballMatchSerializer databaseManager = new DatabaseFootballMatchSerializer();
 
         try {
 
