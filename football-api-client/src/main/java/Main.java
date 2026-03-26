@@ -1,4 +1,6 @@
-import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -10,6 +12,13 @@ public class Main {
 
         Controller controller = new Controller(apiFeeder, matchFilter, databaseSerializer);
 
-        controller.start();
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        Runnable feedingTask = () -> {
+            System.out.println("\n--- Iniciando ciclo de actualización ---");
+            controller.start();
+        };
+
+        scheduler.scheduleAtFixedRate(feedingTask, 0, 1, TimeUnit.HOURS);
     }
 }
