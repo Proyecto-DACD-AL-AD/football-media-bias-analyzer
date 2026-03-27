@@ -1,20 +1,37 @@
 package org.ulpgc.dacd.persistence;
 
 import org.ulpgc.dacd.model.NewsArticle;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Instant;
 import java.util.List;
+import java.util.Properties;
 
 public class DatabaseNewsSerializer implements NewsSerializer {
 
     private final String url;
 
     public DatabaseNewsSerializer() {
-        this.url = "jdbc:sqlite:database/sports_bias.db";
+        this.url = loadUrl();
         initDatabase();
+    }
+
+    private String loadUrl() {
+        Properties prop = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input != null) {
+                prop.load(input);
+                return "jdbc:sqlite:" + prop.getProperty("db.path");
+            }
+        } catch (IOException e) {
+            System.err.println("Error cargando config, usando backup: " + e.getMessage());
+        }
+        return "jdbc:sqlite:database/news.db";
     }
 
     private void initDatabase() {
