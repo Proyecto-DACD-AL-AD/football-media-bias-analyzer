@@ -7,9 +7,9 @@ import java.util.*;
 
 public class Controller {
 
-    FootballMatchFeeder feeder;
-    FootballMatchFilter matchFilter;
-    FootballMatchSerializer serializer;
+    private final FootballMatchFeeder feeder;
+    private final FootballMatchFilter matchFilter;
+    private final FootballMatchSerializer serializer;
 
     public Controller(FootballMatchFeeder feeder, FootballMatchFilter matchFilter, FootballMatchSerializer serializer) {
         this.feeder = feeder;
