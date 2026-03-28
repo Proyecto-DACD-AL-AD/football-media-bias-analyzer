@@ -1,3 +1,5 @@
+package org.ulpgc.dacd.model;
+
 import com.google.gson.annotations.SerializedName;
 
 public class FullTime {

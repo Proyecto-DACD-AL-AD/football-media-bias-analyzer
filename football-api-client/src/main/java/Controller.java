@@ -1,3 +1,8 @@
+import org.ulpgc.dacd.api.FootballMatchFeeder;
+import org.ulpgc.dacd.filter.FootballMatchFilter;
+import org.ulpgc.dacd.model.MatchResponse;
+import org.ulpgc.dacd.persistence.FootballMatchSerializer;
+
 import java.util.*;
 
 public class Controller {

@@ -1,3 +1,5 @@
+package org.ulpgc.dacd.api;
+
 import java.io.IOException;
 
 public interface FootballMatchFeeder {
