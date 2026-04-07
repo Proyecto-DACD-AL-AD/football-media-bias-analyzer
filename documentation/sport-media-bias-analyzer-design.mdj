@@ -5249,7 +5249,7 @@
 											"top": 871,
 											"width": 287,
 											"height": 13,
-											"text": "ApiFootballMatchFeeder"
+											"text": "org.ulpgc.dacd.api.ApiFootballMatchFeeder"
 										},
 										{
 											"_type": "LabelView",
@@ -5548,7 +5548,7 @@
 											"top": 1007,
 											"width": 197,
 											"height": 13,
-											"text": "MatchResponse"
+											"text": "org.ulpgc.dacd.model.MatchResponse"
 										},
 										{
 											"_type": "LabelView",
@@ -5811,7 +5811,7 @@
 											"top": 1175,
 											"width": 102,
 											"height": 13,
-											"text": "Score"
+											"text": "org.ulpgc.dacd.model.Score"
 										},
 										{
 											"_type": "LabelView",
@@ -5987,7 +5987,7 @@
 											"top": 1311,
 											"width": 96,
 											"height": 13,
-											"text": "FullTime"
+											"text": "org.ulpgc.dacd.model.FullTime"
 										},
 										{
 											"_type": "LabelView",
@@ -6199,7 +6199,7 @@
 											"top": 1207,
 											"width": 87,
 											"height": 13,
-											"text": "Team"
+											"text": "org.ulpgc.dacd.model.Team"
 										},
 										{
 											"_type": "LabelView",
@@ -6394,7 +6394,7 @@
 											"top": 1071,
 											"width": 151,
 											"height": 13,
-											"text": "MatchListResponse"
+											"text": "org.ulpgc.dacd.model.MatchListResponse"
 										},
 										{
 											"_type": "LabelView",
@@ -6570,7 +6570,7 @@
 											"top": 871,
 											"width": 345,
 											"height": 13,
-											"text": "FootballMatchFilter"
+											"text": "org.ulpgc.dacd.filter.FootballMatchFilter"
 										},
 										{
 											"_type": "LabelView",
@@ -6674,7 +6674,7 @@
 											"top": 919,
 											"width": 345,
 											"height": 13,
-											"text": "-printFilteredMatches(List-MatchResponse- filteredMatches)",
+											"text": "-printFilteredMatches(List-org.ulpgc.dacd.model.MatchResponse- filteredMatches)",
 											"horizontalAlignment": 0
 										},
 										{
@@ -7020,7 +7020,7 @@
 											"top": 887,
 											"width": 275,
 											"height": 13,
-											"text": "DatabaseFootballMatchSerializer"
+											"text": "org.ulpgc.dacd.persistence.DatabaseFootballMatchSerializer"
 										},
 										{
 											"_type": "LabelView",
@@ -7160,7 +7160,7 @@
 											"top": 963,
 											"width": 275,
 											"height": 13,
-											"text": "+insertMatches(List-MatchResponse- matches)",
+											"text": "+insertMatches(List-org.ulpgc.dacd.model.MatchResponse- matches)",
 											"horizontalAlignment": 0
 										}
 									],
@@ -7268,7 +7268,7 @@
 											"top": 1295,
 											"width": 71,
 											"height": 13,
-											"text": "Standing"
+											"text": "org.ulpgc.dacd.model.Standing"
 										},
 										{
 											"_type": "LabelView",
@@ -7463,7 +7463,7 @@
 											"top": 1159,
 											"width": 124,
 											"height": 13,
-											"text": "StandingsResponse"
+											"text": "org.ulpgc.dacd.model.StandingsResponse"
 										},
 										{
 											"_type": "LabelView",
@@ -7639,7 +7639,7 @@
 											"top": 1295,
 											"width": 86,
 											"height": 13,
-											"text": "TableEntry"
+											"text": "org.ulpgc.dacd.model.TableEntry"
 										},
 										{
 											"_type": "LabelView",
@@ -10785,7 +10785,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "ApiFootballMatchFeeder",
+					"name": "org.ulpgc.dacd.api.ApiFootballMatchFeeder",
 					"attributes": [
 						{
 							"_type": "UMLAttribute",
@@ -10894,7 +10894,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "MatchResponse",
+					"name": "org.ulpgc.dacd.model.MatchResponse",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -11048,7 +11048,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "Score",
+					"name": "org.ulpgc.dacd.model.Score",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -11088,7 +11088,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "FullTime",
+					"name": "org.ulpgc.dacd.model.FullTime",
 					"attributes": [
 						{
 							"_type": "UMLAttribute",
@@ -11118,7 +11118,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "Team",
+					"name": "org.ulpgc.dacd.model.Team",
 					"attributes": [
 						{
 							"_type": "UMLAttribute",
@@ -11138,7 +11138,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "MatchListResponse",
+					"name": "org.ulpgc.dacd.model.MatchListResponse",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -11178,7 +11178,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "FootballMatchFilter",
+					"name": "org.ulpgc.dacd.filter.FootballMatchFilter",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -11289,7 +11289,7 @@
 									"_parent": {
 										"$ref": "AAAAAAGdF8ca1xDPqG0="
 									},
-									"name": "List-MatchResponse- filteredMatches",
+									"name": "List-org.ulpgc.dacd.model.MatchResponse- filteredMatches",
 									"type": ""
 								}
 							]
@@ -11349,7 +11349,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "DatabaseFootballMatchSerializer",
+					"name": "org.ulpgc.dacd.persistence.DatabaseFootballMatchSerializer",
 					"attributes": [
 						{
 							"_type": "UMLAttribute",
@@ -11394,7 +11394,7 @@
 									"_parent": {
 										"$ref": "AAAAAAGdF9D5+Hxdcbs="
 									},
-									"name": "List-MatchResponse- matches",
+									"name": "List-org.ulpgc.dacd.model.MatchResponse- matches",
 									"type": ""
 								}
 							]
@@ -11407,7 +11407,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "Standing",
+					"name": "org.ulpgc.dacd.model.Standing",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -11459,7 +11459,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "StandingsResponse",
+					"name": "org.ulpgc.dacd.model.StandingsResponse",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -11499,7 +11499,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "TableEntry",
+					"name": "org.ulpgc.dacd.model.TableEntry",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",

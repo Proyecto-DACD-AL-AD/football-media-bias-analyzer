@@ -1,3 +1,5 @@
+package org.ulpgc.dacd.api;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

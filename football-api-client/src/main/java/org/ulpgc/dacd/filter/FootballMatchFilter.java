@@ -1,4 +1,7 @@
+package org.ulpgc.dacd.filter;
+
 import com.google.gson.Gson;
+import org.ulpgc.dacd.model.*;
 
 import java.util.*;
 

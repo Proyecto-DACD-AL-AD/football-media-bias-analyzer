@@ -1,3 +1,5 @@
+package org.ulpgc.dacd.model;
+
 import java.util.List;
 
 public class StandingsResponse {

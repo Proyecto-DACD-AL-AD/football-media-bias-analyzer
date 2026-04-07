@@ -1,10 +1,15 @@
+import org.ulpgc.dacd.api.FootballMatchFeeder;
+import org.ulpgc.dacd.filter.FootballMatchFilter;
+import org.ulpgc.dacd.model.MatchResponse;
+import org.ulpgc.dacd.persistence.FootballMatchSerializer;
+
 import java.util.*;
 
 public class Controller {
 
-    FootballMatchFeeder feeder;
-    FootballMatchFilter matchFilter;
-    FootballMatchSerializer serializer;
+    private final FootballMatchFeeder feeder;
+    private final FootballMatchFilter matchFilter;
+    private final FootballMatchSerializer serializer;
 
     public Controller(FootballMatchFeeder feeder, FootballMatchFilter matchFilter, FootballMatchSerializer serializer) {
         this.feeder = feeder;

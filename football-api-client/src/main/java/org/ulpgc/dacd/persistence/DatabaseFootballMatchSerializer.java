@@ -1,7 +1,11 @@
+package org.ulpgc.dacd.persistence;
+
+import org.ulpgc.dacd.model.MatchResponse;
+
 import java.sql.*;
 import java.util.List;
 
-public class DatabaseFootballMatchSerializer implements FootballMatchSerializer{
+public class DatabaseFootballMatchSerializer implements FootballMatchSerializer {
 
     private static final String DB_PATH = "database/sports_bias.db";
 

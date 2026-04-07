@@ -1,3 +1,5 @@
+package org.ulpgc.dacd.model;
+
 public class TableEntry {
     private int position;
     private Team team;
