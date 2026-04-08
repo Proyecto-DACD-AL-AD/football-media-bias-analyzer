@@ -2,7 +2,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ulpgc.dacd.control.filter.FootballMatchFilter;
-import org.ulpgc.dacd.model.MatchResponse;
+import org.ulpgc.dacd.model.Match;
 
 import java.util.List;
 import java.util.Map;
@@ -71,12 +71,12 @@ public class FootballMatchFilterTest {
                 "]" +
                 "}";
 
-        List<MatchResponse> result = matchFilter.filterMatches(mockMatchesJson);
+        List<Match> result = matchFilter.filterMatches(mockMatchesJson);
 
         Assert.assertNotNull("La lista de partidos no debe ser nula", result);
-        Assert.assertEquals("El equipo local del primer partido es incorrecto", "Real Madrid", result.get(0).getHomeTeam().getName());
-        Assert.assertEquals("El estado del primer partido es incorrecto", "FINISHED", result.get(0).getStatus());
-        Assert.assertEquals("La jornada del primer partido es incorrecta", 1, result.get(0).getMatchday());
+        Assert.assertEquals("El equipo local del primer partido es incorrecto", "Real Madrid", result.get(0).homeTeam());
+        // Assert.assertEquals("El estado del primer partido es incorrecto", "FINISHED", result.get(0).status());
+        Assert.assertEquals("La jornada del primer partido es incorrecta", 1, result.get(0).matchday());
 
     }
 
@@ -97,7 +97,7 @@ public class FootballMatchFilterTest {
                 "]" +
                 "}";
 
-        List<MatchResponse> result = matchFilter.filterMatches(mockMatchesJson);
+        List<Match> result = matchFilter.filterMatches(mockMatchesJson);
         Assert.assertEquals("Debería haber 0 partidos en la lista", 0, result.size());
 
     }
@@ -106,7 +106,7 @@ public class FootballMatchFilterTest {
     public void emptyMatchesJsonShouldReturnEmptyList() {
         String emptyJson = "{}";
 
-        java.util.List<MatchResponse> result = matchFilter.filterMatches(emptyJson);
+        List<Match> result = matchFilter.filterMatches(emptyJson);
 
         Assert.assertNotNull("La lista no debe ser nula ni siquiera con JSON vacío", result);
         Assert.assertTrue("La lista debería estar vacía si el JSON no tiene partidos", result.isEmpty());

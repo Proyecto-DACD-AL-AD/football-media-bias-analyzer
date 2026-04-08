@@ -2,7 +2,7 @@ package org.ulpgc.dacd.control;
 
 import org.ulpgc.dacd.control.feeder.FootballMatchFeeder;
 import org.ulpgc.dacd.control.filter.FootballMatchFilter;
-import org.ulpgc.dacd.model.MatchResponse;
+import org.ulpgc.dacd.model.Match;
 import org.ulpgc.dacd.control.persistence.FootballMatchStore;
 
 import java.util.*;
@@ -11,21 +11,21 @@ public class Controller {
 
     private final FootballMatchFeeder feeder;
     private final FootballMatchFilter matchFilter;
-    private final FootballMatchStore serializer;
+    private final FootballMatchStore matchStorer;
 
-    public Controller(FootballMatchFeeder feeder, FootballMatchFilter matchFilter, FootballMatchStore serializer) {
+    public Controller(FootballMatchFeeder feeder, FootballMatchFilter matchFilter, FootballMatchStore matchStorer) {
         this.feeder = feeder;
         this.matchFilter = matchFilter;
-        this.serializer = serializer;
+        this.matchStorer = matchStorer;
     }
 
     public void start() {
 
         try {
-            List<MatchResponse> matchesToSave = matchFilter.filterMatches(feeder.getAllMatches());
+            List<Match> matchesWithoutRank = matchFilter.filterMatches(feeder.getAllMatches());
 
             Set<Integer> matchdaySet = new HashSet<>();
-            for (MatchResponse matchToSave : matchesToSave) matchdaySet.add(matchToSave.getMatchday());
+            for (Match matchToSave : matchesWithoutRank) matchdaySet.add(matchToSave.matchday());
 
 
             Map<Integer, Map<String, Integer>> standingsMap = new HashMap<>();
@@ -39,16 +39,25 @@ public class Controller {
                 Thread.sleep(6000);
             }
 
-            for (MatchResponse match : matchesToSave) {
-                Map<String, Integer> standingOfMatchday = standingsMap.get(match.getMatchday());
+            List<Match> matchesToSave = new ArrayList<>();
+
+            for (Match match : matchesWithoutRank) {
+                Map<String, Integer> standingOfMatchday = standingsMap.get(match.matchday());
+
                 if (standingOfMatchday != null) {
-                    match.setHomeRankAfterMatchday(standingOfMatchday.get(match.getHomeTeam().getName()));
-                    match.setAwayRankAfterMatchday(standingOfMatchday.get(match.getAwayTeam().getName()));
+
+                    int homeRank = standingOfMatchday.getOrDefault(match.homeTeam(), 0);
+                    int awayRank = standingOfMatchday.getOrDefault(match.awayTeam(), 0);
+                    matchesToSave.add(match.addRanks(homeRank, awayRank));
+
+                } else {
+
+                    matchesToSave.add(match);
                 }
             }
 
-            serializer.createTable();
-            serializer.insertMatches(matchesToSave);
+            matchStorer.createTable();
+            matchStorer.insertMatches(matchesToSave);
 
         } catch (Exception e) {
             e.printStackTrace();
