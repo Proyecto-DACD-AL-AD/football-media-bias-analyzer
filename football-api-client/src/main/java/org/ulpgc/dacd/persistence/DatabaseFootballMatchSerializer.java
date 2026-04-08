@@ -1,17 +1,38 @@
 package org.ulpgc.dacd.persistence;
 
 import org.ulpgc.dacd.model.MatchResponse;
-
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.List;
+import java.util.Properties;
 
 public class DatabaseFootballMatchSerializer implements FootballMatchSerializer {
 
-    private static final String DB_PATH = "database/sports_bias.db";
+    private final String url;
+
+    public DatabaseFootballMatchSerializer () {
+        this.url = loadUrl();
+    }
+
+    private String loadUrl() {
+        Properties prop = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input != null) {
+                prop.load(input);
+                return "jdbc:sqlite:" + prop.getProperty("db.path");
+            }
+        } catch (IOException e) {
+            System.err.println("Error cargando la URL: " + e.getMessage());
+        }
+
+        return "";
+    }
+
 
     private Connection connect() throws SQLException {
-        String databaseUrl = "jdbc:sqlite:" + DB_PATH;
-        return DriverManager.getConnection(databaseUrl);
+
+        return DriverManager.getConnection(url);
     }
 
     public void createTable() {
@@ -40,6 +61,7 @@ public class DatabaseFootballMatchSerializer implements FootballMatchSerializer 
             System.out.println("Error al crear la tabla: " + e.getMessage());
         }
     }
+
 
     public void insertMatches(List<MatchResponse> matches) {
 
