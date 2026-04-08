@@ -7,11 +7,11 @@ import java.sql.*;
 import java.util.List;
 import java.util.Properties;
 
-public class DatabaseFootballMatchSerializer implements FootballMatchSerializer {
+public class DatabaseFootballMatchStore implements FootballMatchStore {
 
     private final String url;
 
-    public DatabaseFootballMatchSerializer () {
+    public DatabaseFootballMatchStore() {
         this.url = loadUrl();
     }
 

@@ -7020,7 +7020,7 @@
 											"top": 887,
 											"width": 275,
 											"height": 13,
-											"text": "org.ulpgc.dacd.persistence.DatabaseFootballMatchSerializer"
+											"text": "org.ulpgc.dacd.persistence.DatabaseFootballMatchStore"
 										},
 										{
 											"_type": "LabelView",
@@ -11349,7 +11349,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "org.ulpgc.dacd.persistence.DatabaseFootballMatchSerializer",
+					"name": "org.ulpgc.dacd.persistence.DatabaseFootballMatchStore",
 					"attributes": [
 						{
 							"_type": "UMLAttribute",

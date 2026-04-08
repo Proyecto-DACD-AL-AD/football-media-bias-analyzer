@@ -1,7 +1,7 @@
 import org.ulpgc.dacd.api.FootballMatchFeeder;
 import org.ulpgc.dacd.filter.FootballMatchFilter;
 import org.ulpgc.dacd.model.MatchResponse;
-import org.ulpgc.dacd.persistence.FootballMatchSerializer;
+import org.ulpgc.dacd.persistence.FootballMatchStore;
 
 import java.util.*;
 
@@ -9,9 +9,9 @@ public class Controller {
 
     private final FootballMatchFeeder feeder;
     private final FootballMatchFilter matchFilter;
-    private final FootballMatchSerializer serializer;
+    private final FootballMatchStore serializer;
 
-    public Controller(FootballMatchFeeder feeder, FootballMatchFilter matchFilter, FootballMatchSerializer serializer) {
+    public Controller(FootballMatchFeeder feeder, FootballMatchFilter matchFilter, FootballMatchStore serializer) {
         this.feeder = feeder;
         this.matchFilter = matchFilter;
         this.serializer = serializer;

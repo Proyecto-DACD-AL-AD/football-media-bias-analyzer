@@ -1,6 +1,6 @@
 import org.ulpgc.dacd.api.ApiFootballMatchFeeder;
 import org.ulpgc.dacd.filter.FootballMatchFilter;
-import org.ulpgc.dacd.persistence.DatabaseFootballMatchSerializer;
+import org.ulpgc.dacd.persistence.DatabaseFootballMatchStore;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -12,9 +12,9 @@ public class Main {
 
         ApiFootballMatchFeeder apiFeeder = new ApiFootballMatchFeeder();
         FootballMatchFilter matchFilter = new FootballMatchFilter();
-        DatabaseFootballMatchSerializer databaseSerializer = new DatabaseFootballMatchSerializer();
+        DatabaseFootballMatchStore matchStorer = new DatabaseFootballMatchStore();
 
-        Controller controller = new Controller(apiFeeder, matchFilter, databaseSerializer);
+        Controller controller = new Controller(apiFeeder, matchFilter, matchStorer);
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
