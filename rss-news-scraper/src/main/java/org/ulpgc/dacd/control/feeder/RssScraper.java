@@ -14,21 +14,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BaseRssScraper implements NewsScraper {
-    private final String BASE_URL;
-    private final String SOURCE_NAME;
-    private final Map<String, String> TEAM_URL_NAMES;
+public class RssScraper implements NewsScraper {
+    private final String baseUrl;
+    private final String sourceName;
+    private final Map<String, String> teamUrlNames;
 
-    protected BaseRssScraper(String baseUrl, String sourceName, Map<String, String> teamUrlNames) {
-        this.BASE_URL = baseUrl;
-        this.SOURCE_NAME = sourceName;
-        this.TEAM_URL_NAMES = teamUrlNames;
+    public RssScraper(String configFilePath) {
+        try (java.io.Reader reader = new java.io.InputStreamReader(
+                java.util.Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream(configFilePath)))) {
+
+            com.google.gson.Gson gson = new com.google.gson.Gson();
+            FeederConfig config = gson.fromJson(reader, FeederConfig.class);
+
+            this.baseUrl = config.baseUrl();
+            this.sourceName = config.sourceName();
+            this.teamUrlNames = config.teamUrlNames();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public final List<NewsArticle> feed(String teamName) {
         List<NewsArticle> articles = new ArrayList<>();
-        String teamSlug = TEAM_URL_NAMES.get(teamName);
+        String teamSlug = teamUrlNames.get(teamName);
 
         if (teamSlug == null) {
             handleMissingTeam(teamName);
@@ -36,13 +46,13 @@ public abstract class BaseRssScraper implements NewsScraper {
         }
 
         try {
-            Document doc = Jsoup.connect(String.format(BASE_URL, teamSlug)).get();
+            Document doc = Jsoup.connect(String.format(baseUrl, teamSlug)).get();
             Elements items = doc.select("item");
             for (Element item : items) {
                 articles.add(parseArticle(item, teamName));
             }
         } catch (IOException e) {
-            System.err.println("Error en " + SOURCE_NAME + " para " + teamName + ": " + e.getMessage());
+            System.err.println("Error en " + sourceName + " para " + teamName + ": " + e.getMessage());
         }
         return articles;
     }
@@ -52,13 +62,13 @@ public abstract class BaseRssScraper implements NewsScraper {
                 extractText(item, "title"),
                 extractText(item, "link"),
                 parseDate(extractText(item, "pubDate")),
-                SOURCE_NAME,
+                sourceName,
                 teamName
         );
     }
 
     protected void handleMissingTeam(String teamName) {
-        System.out.println("[" + SOURCE_NAME + "] Aviso: El equipo '" + teamName + "' no está configurado.");
+        System.out.println("[" + sourceName + "] Aviso: El equipo '" + teamName + "' no está configurado.");
     }
 
     private Instant parseDate(String dateStr) {

@@ -1,7 +1,6 @@
 package org.ulpgc.dacd.feeder;
 
 import org.junit.Test;
-import org.ulpgc.dacd.control.feeder.MundoDeportivoScraper;
 import org.ulpgc.dacd.control.feeder.NewsScraper;
 import org.ulpgc.dacd.model.NewsArticle;
 

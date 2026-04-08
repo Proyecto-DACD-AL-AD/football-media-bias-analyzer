@@ -1,13 +1,10 @@
 package org.ulpgc.dacd;
 
 import org.ulpgc.dacd.control.Controller;
-import org.ulpgc.dacd.control.feeder.AsRssScraper;
-import org.ulpgc.dacd.control.feeder.MarcaRssScraper;
-import org.ulpgc.dacd.control.feeder.MundoDeportivoScraper;
 import org.ulpgc.dacd.control.feeder.NewsScraper;
+import org.ulpgc.dacd.control.feeder.RssScraper;
 import org.ulpgc.dacd.control.persistence.DatabaseNewsStore;
 import org.ulpgc.dacd.control.persistence.NewsStore;
-import org.ulpgc.dacd.control.feeder.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +12,9 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         List<NewsScraper> feeders = Arrays.asList(
-                new MarcaRssScraper(),
-                new AsRssScraper(),
-                new MundoDeportivoScraper()
+                new RssScraper("feeders/marca_config.json"),
+                new RssScraper("feeders/as_config.json"),
+                new RssScraper("feeders/mundo_deportivo_config.json")
         );
 
         NewsStore store = new DatabaseNewsStore();

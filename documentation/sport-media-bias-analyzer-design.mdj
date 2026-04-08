@@ -17,7 +17,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "org.ulpgc.dacd.scraper",
+					"name": "org.ulpgc.dacd.feeder",
 					"defaultDiagram": true,
 					"ownedViews": [
 						{
