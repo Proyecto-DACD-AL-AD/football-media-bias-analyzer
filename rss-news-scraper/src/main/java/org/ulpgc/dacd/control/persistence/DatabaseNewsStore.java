@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.persistence;
+package org.ulpgc.dacd.control.persistence;
 
 import org.ulpgc.dacd.model.NewsArticle;
 
@@ -12,11 +12,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Properties;
 
-public class DatabaseNewsSerializer implements NewsSerializer {
+public class DatabaseNewsStore implements NewsStore {
 
     private final String url;
 
-    public DatabaseNewsSerializer() {
+    public DatabaseNewsStore() {
         this.url = loadUrl();
         initDatabase();
     }
@@ -54,7 +54,7 @@ public class DatabaseNewsSerializer implements NewsSerializer {
     }
 
     @Override
-    public void serialize(List<NewsArticle> articles) {
+    public void store(List<NewsArticle> articles) {
         String sql = "INSERT OR IGNORE INTO news (title, link, pub_date, source, team, captured_at) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(url);
