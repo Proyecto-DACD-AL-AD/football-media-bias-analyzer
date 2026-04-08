@@ -11,8 +11,8 @@ public record Match(
         int homeRankAfterMatchday,
         int awayRankAfterMatchday) {
 
-    public Match addRanks(int homeRankAfterMatchday, int awayRankAfterMatchday) {
-        return new Match(date, matchday, homeTeam, awayTeam, homeGoals, awayGoals, homeRankAfterMatchday,
-                awayRankAfterMatchday);
+    public Match addRanks(int homeRank, int awayRank) {
+        return new Match(date, matchday, homeTeam, awayTeam, homeGoals, awayGoals, homeRank,
+                awayRank);
     }
 }
