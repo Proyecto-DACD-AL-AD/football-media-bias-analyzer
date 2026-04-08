@@ -1,18 +1,20 @@
-package org.ulpgc.dacd.scraper;
+package org.ulpgc.dacd.feeder;
 
 import org.junit.Test;
+import org.ulpgc.dacd.control.feeder.MarcaRssScraper;
+import org.ulpgc.dacd.control.feeder.NewsScraper;
 import org.ulpgc.dacd.model.NewsArticle;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-public class MundoDeportivoScraperTest {
+public class MarcaRssScraperTest {
 
     @Test
     public void shouldReturnArticlesForAllTeams() {
-        NewsScraper scraper = new MundoDeportivoScraper();
+        NewsScraper scraper = new MarcaRssScraper();
         List<String> teams = Arrays.asList(
                 "Real Madrid CF", "FC Barcelona", "Real Betis Balompié", "Sevilla FC",
                 "Real Sociedad de Fútbol", "Athletic Club", "UD Las Palmas", "CD Tenerife"
@@ -22,12 +24,12 @@ public class MundoDeportivoScraperTest {
             List<NewsArticle> articles = scraper.feed(team);
 
             assertNotNull(articles);
-            assertFalse("Debería haber noticias en Mundo Deportivo para " + team, articles.isEmpty());
+            assertFalse("Debería haber noticias en Marca para " + team, articles.isEmpty());
 
             NewsArticle firstArticle = articles.getFirst();
             assertNotNull(firstArticle.title());
             assertFalse(firstArticle.title().isBlank());
-            assertEquals("Mundo Deportivo", firstArticle.source());
+            assertEquals("Marca", firstArticle.source());
             assertEquals(team, firstArticle.team());
         }
     }

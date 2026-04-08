@@ -1,6 +1,8 @@
-package org.ulpgc.dacd.scraper;
+package org.ulpgc.dacd.feeder;
 
 import org.junit.Test;
+import org.ulpgc.dacd.control.feeder.AsRssScraper;
+import org.ulpgc.dacd.control.feeder.NewsScraper;
 import org.ulpgc.dacd.model.NewsArticle;
 
 import java.util.Arrays;
