@@ -1,17 +1,39 @@
-package org.ulpgc.dacd.persistence;
+package org.ulpgc.dacd.control.persistence;
 
-import org.ulpgc.dacd.model.MatchResponse;
+import org.ulpgc.dacd.model.Match;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.List;
+import java.util.Properties;
 
-public class DatabaseFootballMatchSerializer implements FootballMatchSerializer {
+public class DatabaseFootballMatchStore implements FootballMatchStore {
 
-    private static final String DB_PATH = "database/sports_bias.db";
+    private final String url;
+
+    public DatabaseFootballMatchStore() {
+        this.url = loadUrl();
+    }
+
+    private String loadUrl() {
+        Properties prop = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input != null) {
+                prop.load(input);
+                return "jdbc:sqlite:" + prop.getProperty("db.path");
+            }
+        } catch (IOException e) {
+            System.err.println("Error cargando la URL: " + e.getMessage());
+        }
+
+        return "";
+    }
+
 
     private Connection connect() throws SQLException {
-        String databaseUrl = "jdbc:sqlite:" + DB_PATH;
-        return DriverManager.getConnection(databaseUrl);
+
+        return DriverManager.getConnection(url);
     }
 
     public void createTable() {
@@ -24,7 +46,6 @@ public class DatabaseFootballMatchSerializer implements FootballMatchSerializer 
                 "away_goals INTEGER,\n" +
                 "home_rank_after_matchday INTEGER,\n" +
                 "away_rank_after_matchday INTEGER,\n" +
-                "status TEXT,\n" +
                 "match_date TEXT,\n" +
                 "captured_at TEXT DEFAULT CURRENT_TIMESTAMP," +
                 "UNIQUE(matchday, home_team, away_team)" +
@@ -41,25 +62,25 @@ public class DatabaseFootballMatchSerializer implements FootballMatchSerializer 
         }
     }
 
-    public void insertMatches(List<MatchResponse> matches) {
+
+    public void insertMatches(List<Match> matches) {
 
         String sqlInsert = "INSERT OR IGNORE INTO matches (matchday, home_team, away_team, home_goals, away_goals, " +
-                "home_rank_after_matchday, away_rank_after_matchday, status, match_date) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                "home_rank_after_matchday, away_rank_after_matchday, match_date) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
         try (Connection connection = connect();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)) {
 
-            for (MatchResponse match : matches) {
-                preparedStatement.setInt(1, match.getMatchday());
-                preparedStatement.setString(2, match.getHomeTeam().getName());
-                preparedStatement.setString(3, match.getAwayTeam().getName());
-                preparedStatement.setInt(4, match.getScore().getFullTime().getHomeGoals());
-                preparedStatement.setInt(5, match.getScore().getFullTime().getAwayGoals());
-                preparedStatement.setInt(6, match.getHomeRankAfterMatchday());
-                preparedStatement.setInt(7, match.getAwayRankAfterMatchday());
-                preparedStatement.setString(8, match.getStatus());
-                preparedStatement.setString(9, match.getDate());
+            for (Match match : matches) {
+                preparedStatement.setInt(1, match.matchday());
+                preparedStatement.setString(2, match.homeTeam());
+                preparedStatement.setString(3, match.awayTeam());
+                preparedStatement.setInt(4, match.homeGoals());
+                preparedStatement.setInt(5, match.awayGoals());
+                preparedStatement.setInt(6, match.homeRankAfterMatchday());
+                preparedStatement.setInt(7, match.awayRankAfterMatchday());
+                preparedStatement.setString(8, String.valueOf(match.date()));
 
                 preparedStatement.executeUpdate();
             }

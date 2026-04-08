@@ -3142,7 +3142,7 @@
 											"top": 967,
 											"width": 80.57080078125,
 											"height": 13,
-											"text": "Controller"
+											"text": "org.ulpgc.dacd.control.Controller"
 										},
 										{
 											"_type": "LabelView",
@@ -4922,7 +4922,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Controller",
+					"name": "org.ulpgc.dacd.control.Controller",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -5008,7 +5008,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "org.ulpgc.dacd.api",
+					"name": "org.ulpgc.dacd.feeder",
 					"ownedViews": [
 						{
 							"_type": "UMLClassView",
@@ -5249,7 +5249,7 @@
 											"top": 871,
 											"width": 287,
 											"height": 13,
-											"text": "org.ulpgc.dacd.api.ApiFootballMatchFeeder"
+											"text": "org.ulpgc.dacd.feeder.ApiFootballMatchFeeder"
 										},
 										{
 											"_type": "LabelView",
@@ -7020,7 +7020,7 @@
 											"top": 887,
 											"width": 275,
 											"height": 13,
-											"text": "org.ulpgc.dacd.persistence.DatabaseFootballMatchSerializer"
+											"text": "org.ulpgc.dacd.control.persistence.DatabaseFootballMatchStore"
 										},
 										{
 											"_type": "LabelView",
@@ -10785,7 +10785,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "org.ulpgc.dacd.api.ApiFootballMatchFeeder",
+					"name": "org.ulpgc.dacd.feeder.ApiFootballMatchFeeder",
 					"attributes": [
 						{
 							"_type": "UMLAttribute",
@@ -11349,7 +11349,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGdAQnv/scPeOY="
 					},
-					"name": "org.ulpgc.dacd.persistence.DatabaseFootballMatchSerializer",
+					"name": "org.ulpgc.dacd.control.persistence.DatabaseFootballMatchStore",
 					"attributes": [
 						{
 							"_type": "UMLAttribute",
