@@ -23,7 +23,7 @@ public class FootballMatchFilterTest {
                 "\"standings\": [{" +
                 "\"type\": \"TOTAL\"," +
                 "\"table\": [" +
-                "{\"position\": 1, \"team\": {\"name\": \"Real Madrid\"}}," +
+                "{\"position\": 1, \"team\": {\"name\": \"Real Madrid CF\"}}," +
                 "{\"position\": 2, \"team\": {\"name\": \"FC Barcelona\"}}" +
                 "]" +
                 "}]" +
@@ -32,13 +32,12 @@ public class FootballMatchFilterTest {
         Map<String, Integer> result = matchFilter.parseStandings(mockJson);
         Assert.assertNotNull("El mapa resultante no debería ser nulo", result);
         Assert.assertEquals("Debería haber 2 equipos en el mapa", 2, result.size());
-        Assert.assertEquals("Real Madrid posición incorrecta", Integer.valueOf(1), result.get("Real Madrid"));
+        Assert.assertEquals("Real Madrid posición incorrecta", Integer.valueOf(1), result.get("Real Madrid CF"));
         Assert.assertEquals("FC Barcelona posición incorrecta", Integer.valueOf(2), result.get("FC Barcelona"));
     }
 
     @Test
     public void emptyJsonShouldReturnEmptyMap() {
-
         String emptyJson = "{}";
         Map<String, Integer> result = matchFilter.parseStandings(emptyJson);
         Assert.assertNotNull("El mapa resultante debe estar vacío, no ser nulo", result);
@@ -51,21 +50,23 @@ public class FootballMatchFilterTest {
         String mockMatchesJson = "{" +
                 "\"matches\": [" +
                 "  {" +
+                "    \"utcDate\": \"2024-05-15T19:00:00Z\"," +
                 "    \"matchday\": 1," +
                 "    \"status\": \"FINISHED\"," +
-                "    \"homeTeam\": {\"name\": \"Real Madrid\"}," +
+                "    \"homeTeam\": {\"name\": \"Real Madrid CF\"}," +
                 "    \"awayTeam\": {\"name\": \"FC Barcelona\"}," +
                 "    \"score\": {" +
-                "      \"fullTime\": {\"homeGoals\": 2, \"awayGoals\": 1}" +
+                "      \"fullTime\": {\"home\": 2, \"away\": 1}" +
                 "    }" +
                 "  }," +
                 "  {" +
+                "    \"utcDate\": \"2024-05-16T19:00:00Z\"," +
                 "    \"matchday\": 1," +
                 "    \"status\": \"SCHEDULED\"," +
                 "    \"homeTeam\": {\"name\": \"Sevilla FC\"}," +
-                "    \"awayTeam\": {\"name\": \"Real Betis\"}," +
+                "    \"awayTeam\": {\"name\": \"Real Betis Balompié\"}," +
                 "    \"score\": {" +
-                "      \"fullTime\": {\"homeGoals\": null, \"awayGoals\": null}" +
+                "      \"fullTime\": {\"home\": null, \"away\": null}" +
                 "    }" +
                 "  }" +
                 "]" +
@@ -74,24 +75,27 @@ public class FootballMatchFilterTest {
         List<Match> result = matchFilter.filterMatches(mockMatchesJson);
 
         Assert.assertNotNull("La lista de partidos no debe ser nula", result);
-        Assert.assertEquals("El equipo local del primer partido es incorrecto", "Real Madrid", result.get(0).homeTeam());
-        // Assert.assertEquals("El estado del primer partido es incorrecto", "FINISHED", result.get(0).status());
-        Assert.assertEquals("La jornada del primer partido es incorrecta", 1, result.get(0).matchday());
+
+        Assert.assertEquals("Debería haber filtrado el partido no finalizado", 1, result.size());
+        Assert.assertEquals("El equipo local del primer partido es incorrecto", "Real Madrid CF", result.getFirst().homeTeam());
+        Assert.assertEquals("La jornada del primer partido es incorrecta", 1, result.getFirst().matchday());
 
     }
 
     @Test
     public void scheduledMatchShouldNotAppearInFilteredMatches() {
-
+        // AÑADIDO: utcDate. Aunque se filtre por status antes, es buena práctica
+        // tener un JSON de mock lo más real posible.
         String mockMatchesJson = "{" +
                 "\"matches\": [" +
                 "  {" +
+                "    \"utcDate\": \"2024-05-16T19:00:00Z\"," +
                 "    \"matchday\": 1," +
                 "    \"status\": \"SCHEDULED\"," +
                 "    \"homeTeam\": {\"name\": \"Sevilla FC\"}," +
-                "    \"awayTeam\": {\"name\": \"Real Betis\"}," +
+                "    \"awayTeam\": {\"name\": \"Real Betis Balompié\"}," +
                 "    \"score\": {" +
-                "      \"fullTime\": {\"homeGoals\": null, \"awayGoals\": null}" +
+                "      \"fullTime\": {\"home\": null, \"away\": null}" +
                 "    }" +
                 "  }" +
                 "]" +
@@ -99,13 +103,11 @@ public class FootballMatchFilterTest {
 
         List<Match> result = matchFilter.filterMatches(mockMatchesJson);
         Assert.assertEquals("Debería haber 0 partidos en la lista", 0, result.size());
-
     }
 
     @Test
     public void emptyMatchesJsonShouldReturnEmptyList() {
         String emptyJson = "{}";
-
         List<Match> result = matchFilter.filterMatches(emptyJson);
 
         Assert.assertNotNull("La lista no debe ser nula ni siquiera con JSON vacío", result);
