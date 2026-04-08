@@ -1,6 +1,7 @@
-import org.ulpgc.dacd.api.ApiFootballMatchFeeder;
-import org.ulpgc.dacd.filter.FootballMatchFilter;
-import org.ulpgc.dacd.persistence.DatabaseFootballMatchStore;
+import org.ulpgc.dacd.control.Controller;
+import org.ulpgc.dacd.control.feeder.ApiFootballMatchFeeder;
+import org.ulpgc.dacd.control.filter.FootballMatchFilter;
+import org.ulpgc.dacd.control.persistence.DatabaseFootballMatchStore;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

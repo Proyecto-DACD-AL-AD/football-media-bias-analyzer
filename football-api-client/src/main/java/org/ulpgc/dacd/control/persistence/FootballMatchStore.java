@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.persistence;
+package org.ulpgc.dacd.control.persistence;
 
 import org.ulpgc.dacd.model.MatchResponse;
 

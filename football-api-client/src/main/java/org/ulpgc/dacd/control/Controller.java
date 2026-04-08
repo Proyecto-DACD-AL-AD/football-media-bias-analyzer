@@ -1,7 +1,9 @@
-import org.ulpgc.dacd.api.FootballMatchFeeder;
-import org.ulpgc.dacd.filter.FootballMatchFilter;
+package org.ulpgc.dacd.control;
+
+import org.ulpgc.dacd.control.feeder.FootballMatchFeeder;
+import org.ulpgc.dacd.control.filter.FootballMatchFilter;
 import org.ulpgc.dacd.model.MatchResponse;
-import org.ulpgc.dacd.persistence.FootballMatchStore;
+import org.ulpgc.dacd.control.persistence.FootballMatchStore;
 
 import java.util.*;
 

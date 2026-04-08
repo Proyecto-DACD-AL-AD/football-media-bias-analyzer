@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.filter;
+package org.ulpgc.dacd.control.filter;
 
 import com.google.gson.Gson;
 import org.ulpgc.dacd.model.*;
