@@ -1,22 +1,27 @@
 package org.ulpgc.dacd.control.filter;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import org.ulpgc.dacd.model.Match;
+
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FootballMatchFilter {
 
-    private static final List<String> MEDIA_TEAMS = List.of(
-            "Real Madrid CF", "FC Barcelona", "Real Betis Balompié",
-            "Sevilla FC", "Athletic Club", "Real Sociedad de Fútbol"
-    );
+    private static final List<String> MEDIA_TEAMS = loadTeams("media_teams.json") ;
+
+    public static List<String> loadTeams(String filePath) {
+        try (InputStreamReader reader = new InputStreamReader(
+                Objects.requireNonNull(FootballMatchFilter.class.getClassLoader().getResourceAsStream(filePath)))) {
+            Type listType = new TypeToken<List<String>>() {}.getType();
+            return new Gson().fromJson(reader, listType);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public List<Match> filterMatches(String allMatchesJson) {
 
