@@ -20,7 +20,7 @@ public class Main {
 
         NewsStore store = new DatabaseNewsStore();
 
-        List<String> teams = TeamLoader.load("teams.json");
+        List<String> teams = TeamLoader.load("media_teams.json");
 
         Controller controller = new Controller(feeders, store, teams);
         controller.start();
