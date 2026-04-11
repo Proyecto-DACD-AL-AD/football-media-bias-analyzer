@@ -5,6 +5,7 @@ import org.ulpgc.dacd.control.feeder.NewsScraper;
 import org.ulpgc.dacd.control.feeder.RssScraper;
 import org.ulpgc.dacd.control.persistence.DatabaseNewsStore;
 import org.ulpgc.dacd.control.persistence.NewsStore;
+import org.ulpgc.dacd.control.config.TeamLoader;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,10 +20,7 @@ public class Main {
 
         NewsStore store = new DatabaseNewsStore();
 
-        List<String> teams = Arrays.asList(
-                "Real Madrid CF", "FC Barcelona", "Real Betis Balompié", "Sevilla FC",
-                "Real Sociedad de Fútbol", "Athletic Club", "UD Las Palmas", "CD Tenerife"
-        );
+        List<String> teams = TeamLoader.load("teams.json");
 
         Controller controller = new Controller(feeders, store, teams);
         controller.start();
