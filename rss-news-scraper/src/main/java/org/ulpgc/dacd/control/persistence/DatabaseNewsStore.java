@@ -67,7 +67,7 @@ public class DatabaseNewsStore implements NewsStore {
             for (NewsArticle article : articles) {
                 pstmt.setString(1, article.title());
                 pstmt.setString(2, article.link());
-                pstmt.setString(3, article.date().toString());
+                pstmt.setString(3, article.pubDate().toString());
                 pstmt.setString(4, article.source());
                 pstmt.setString(5, article.team());
                 pstmt.setString(6, now);

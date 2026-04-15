@@ -58,12 +58,17 @@ public class RssScraper implements NewsScraper {
     }
 
     protected NewsArticle parseArticle(Element item, String teamName) {
+        String ss = "news-feeder";
+        Instant ts = Instant.now();
+
         return new NewsArticle(
                 extractText(item, "title"),
                 extractText(item, "link"),
                 parseDate(extractText(item, "pubDate")),
                 sourceName,
-                teamName
+                teamName,
+                ss,
+                ts
         );
     }
 

@@ -5,8 +5,10 @@ import java.time.Instant;
 public record NewsArticle(
         String title,
         String link,
-        Instant date,
+        Instant pubDate,
         String source,
-        String team
+        String team,
+        String ss,
+        Instant ts
 ) {
 }
