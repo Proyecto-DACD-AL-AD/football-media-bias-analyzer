@@ -20,23 +20,20 @@ public class FootballMatchPublisher implements FootballMatchStore {
 
     public void store(List<Match> matches) {
         try {
-
             ConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
             Connection connection = factory.createConnection();
             connection.start();
 
-
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = session.createTopic(topicName);
+            MessageProducer producer = session.createProducer(destination);
 
             for (Match match: matches) {
-
                 String jsonEvent = gson.toJson(match);
-                MessageProducer producer = session.createProducer(destination);
                 TextMessage message = session.createTextMessage(jsonEvent);
-
                 producer.send(message);
             }
+
             System.out.println("Se han enviado todos los mensajes al topic: '" + topicName + "'...");
             connection.close();
 
