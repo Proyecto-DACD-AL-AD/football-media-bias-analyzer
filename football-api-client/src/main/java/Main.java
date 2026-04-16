@@ -11,6 +11,12 @@ public class Main {
 
     public static void main(String[] args) {
 
+        if(System.getenv("API_TOKEN") == null
+                || System.getenv("API_TOKEN").trim().isEmpty()) {
+            System.out.println("La variable de entorno API_TOKEN no está configurada");
+            System.exit(1);
+        }
+
         ApiFootballMatchFeeder apiFeeder = new ApiFootballMatchFeeder();
         FootballMatchFilter matchFilter = new FootballMatchFilter();
         FootballMatchPublisher matchStorer = new FootballMatchPublisher("tcp://localhost:61616", "football-matches");
