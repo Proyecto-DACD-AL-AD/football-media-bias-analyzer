@@ -56,8 +56,7 @@ public class Controller {
                 }
             }
 
-            matchStorer.createTable();
-            matchStorer.insertMatches(matchesToSave);
+            matchStorer.store(matchesToSave);
 
         } catch (Exception e) {
             e.printStackTrace();
