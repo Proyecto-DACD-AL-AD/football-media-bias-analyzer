@@ -9,10 +9,12 @@ public record Match(
         int homeGoals,
         int awayGoals,
         int homeRankAfterMatchday,
-        int awayRankAfterMatchday) {
+        int awayRankAfterMatchday,
+        String ss,
+        Instant ts) {
 
     public Match addRanks(int homeRank, int awayRank) {
         return new Match(date, matchday, homeTeam, awayTeam, homeGoals, awayGoals, homeRank,
-                awayRank);
+                awayRank, ss, ts);
     }
 }

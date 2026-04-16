@@ -51,12 +51,13 @@ public class FootballMatchFilter {
             JsonObject fullTime = matchJson.getAsJsonObject("score").getAsJsonObject("fullTime");
             int homeGoals = fullTime.get("home").getAsInt();
             int awayGoals = fullTime.get("away").getAsInt();
+            String ss = "football-match-feeder";
+            Instant ts = Instant.now();
 
-            Match match = new Match(date, matchday, homeTeam, awayTeam, homeGoals, awayGoals, 0, 0);
+            Match match = new Match(date, matchday, homeTeam, awayTeam, homeGoals, awayGoals, 0, 0, ss, ts);
             filteredMatches.add(match);
         }
 
-        // printFilteredMatches(filteredMatches);
         return filteredMatches;
     }
 
@@ -94,10 +95,4 @@ public class FootballMatchFilter {
         return rawJson == null || rawJson.trim().equals("{}") || rawJson.trim().isEmpty();
     }
 
-    private static void printFilteredMatches(List<Match> filteredMatches) {
-        for (Match match : filteredMatches) {
-            String result = match.homeGoals() + " - " + match.awayGoals();
-            System.out.println(match.homeTeam() + " [" + result + "] " + match.awayTeam() + " | Jornada: " + match.matchday());
-        }
-    }
 }

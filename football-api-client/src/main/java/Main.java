@@ -1,7 +1,7 @@
 import org.ulpgc.dacd.control.Controller;
 import org.ulpgc.dacd.control.feeder.ApiFootballMatchFeeder;
 import org.ulpgc.dacd.control.filter.FootballMatchFilter;
-import org.ulpgc.dacd.control.persistence.DatabaseFootballMatchStore;
+import org.ulpgc.dacd.control.persistence.FootballMatchPublisher;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,7 +13,7 @@ public class Main {
 
         ApiFootballMatchFeeder apiFeeder = new ApiFootballMatchFeeder();
         FootballMatchFilter matchFilter = new FootballMatchFilter();
-        DatabaseFootballMatchStore matchStorer = new DatabaseFootballMatchStore();
+        FootballMatchPublisher matchStorer = new FootballMatchPublisher("tcp://localhost:61616", "football-matches");
 
         Controller controller = new Controller(apiFeeder, matchFilter, matchStorer);
 

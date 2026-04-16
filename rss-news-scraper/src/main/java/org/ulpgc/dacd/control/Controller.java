@@ -8,12 +8,12 @@ import java.util.List;
 
 public class Controller {
     private final List<NewsScraper> scrapers;
-    private final NewsStore serializer;
+    private final NewsStore storer;
     private final List<String> teams;
 
-    public Controller(List<NewsScraper> scrapers, NewsStore serializer, List<String> teams) {
+    public Controller(List<NewsScraper> scrapers, NewsStore store, List<String> teams) {
         this.scrapers = scrapers;
-        this.serializer = serializer;
+        this.storer = store;
         this.teams = teams;
     }
 
@@ -22,7 +22,7 @@ public class Controller {
             for (String team : teams) {
                 List<NewsArticle> articles = scraper.feed(team);
                 if (!articles.isEmpty()) {
-                    serializer.store(articles);
+                    storer.store(articles);
                 }
             }
         }

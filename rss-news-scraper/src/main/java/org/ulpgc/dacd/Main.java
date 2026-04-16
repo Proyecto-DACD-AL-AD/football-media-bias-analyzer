@@ -3,7 +3,7 @@ package org.ulpgc.dacd;
 import org.ulpgc.dacd.control.Controller;
 import org.ulpgc.dacd.control.feeder.NewsScraper;
 import org.ulpgc.dacd.control.feeder.RssScraper;
-import org.ulpgc.dacd.control.persistence.DatabaseNewsStore;
+import org.ulpgc.dacd.control.persistence.NewsPublisher;
 import org.ulpgc.dacd.control.persistence.NewsStore;
 import org.ulpgc.dacd.control.config.TeamLoader;
 
@@ -18,7 +18,7 @@ public class Main {
                 new RssScraper("feeders/mundo_deportivo_config.json")
         );
 
-        NewsStore store = new DatabaseNewsStore();
+        NewsStore store = new NewsPublisher("tcp://localhost:61616", "news");
 
         List<String> teams = TeamLoader.load("media_teams.json");
 

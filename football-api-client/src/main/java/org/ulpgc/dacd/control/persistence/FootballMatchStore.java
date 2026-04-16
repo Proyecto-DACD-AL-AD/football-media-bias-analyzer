@@ -6,6 +6,5 @@ import java.util.List;
 
 public interface FootballMatchStore {
 
-     void createTable();
-     void insertMatches(List<Match> matches);
+     void store(List<Match> matches);
 }
