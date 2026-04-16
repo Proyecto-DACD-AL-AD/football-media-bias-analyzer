@@ -3,7 +3,6 @@ package org.ulpgc.dacd.control.persistence;
 import com.google.gson.Gson;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import jakarta.jms.*;
-import org.ulpgc.dacd.control.activemq.InstantSerializer;
 import org.ulpgc.dacd.model.Match;
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class FootballMatchPublisher implements FootballMatchStore {
     public FootballMatchPublisher(String brokerUrl, String topicName) {
         this.brokerUrl = brokerUrl;
         this.topicName = topicName;
-        this.gson = InstantSerializer.create();
+        this.gson = EventSerializer.create();
     }
 
     public void store(List<Match> matches) {

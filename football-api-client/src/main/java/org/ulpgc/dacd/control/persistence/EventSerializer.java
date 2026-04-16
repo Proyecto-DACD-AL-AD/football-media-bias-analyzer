@@ -1,10 +1,10 @@
-package org.ulpgc.dacd.control.activemq;
+package org.ulpgc.dacd.control.persistence;
 
 import com.google.gson.*;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
-public class InstantSerializer {
+public class EventSerializer {
 
     public static Gson create() {
 
