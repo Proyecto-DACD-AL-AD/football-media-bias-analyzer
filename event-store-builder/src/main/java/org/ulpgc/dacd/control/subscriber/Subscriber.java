@@ -1,13 +1,14 @@
-package org.ulpgc.dacd.control;
+package org.ulpgc.dacd.control.subscriber;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import jakarta.jms.*;
+import org.ulpgc.dacd.control.persistence.EventStore;
 
 public class Subscriber {
 
     private final String brokerUrl;
     private final String topicName;
-    private final String clientId; // Durable
+    private final String clientId;
     private final EventStore store;
 
     public Subscriber(String brokerUrl, String topicName, String clientId, EventStore store) {
@@ -17,16 +18,9 @@ public class Subscriber {
         this.store = store;
     }
 
-    public void start() {
+    public void startConsuming() {
         try {
-
-            ConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
-            Connection connection = factory.createConnection();
-
-            connection.setClientID(clientId);
-            connection.start();
-
-
+            Connection connection = createConnection();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Topic topic = session.createTopic(topicName);
 
@@ -49,5 +43,14 @@ public class Subscriber {
         } catch (JMSException e) {
             System.err.println("Error de conexión con ActiveMQ: " + e.getMessage());
         }
+    }
+
+    private Connection createConnection() throws JMSException {
+        ConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
+        Connection connection = factory.createConnection();
+
+        connection.setClientID(clientId);
+        connection.start();
+        return connection;
     }
 }

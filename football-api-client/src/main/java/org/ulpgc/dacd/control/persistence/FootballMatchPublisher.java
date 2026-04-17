@@ -18,11 +18,10 @@ public class FootballMatchPublisher implements FootballMatchStore {
         this.gson = EventSerializer.create();
     }
 
+    @Override
     public void store(List<Match> matches) {
-        try {
-            ConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
-            Connection connection = factory.createConnection();
-            connection.start();
+
+        try (Connection connection = createConnection()){
 
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = session.createTopic(topicName);
@@ -35,10 +34,17 @@ public class FootballMatchPublisher implements FootballMatchStore {
             }
 
             System.out.println("Se han enviado todos los mensajes al topic: '" + topicName + "'...");
-            connection.close();
 
         } catch (JMSException e) {
+
             System.err.println("Error al enviar el mensaje a ActiveMQ: " + e.getMessage());
         }
+    }
+
+    private Connection createConnection() throws JMSException {
+        ConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
+        Connection connection = factory.createConnection();
+        connection.start();
+        return connection;
     }
 }

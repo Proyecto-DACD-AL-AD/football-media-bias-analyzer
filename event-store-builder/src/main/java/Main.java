@@ -1,7 +1,7 @@
 import org.ulpgc.dacd.control.Controller;
-import org.ulpgc.dacd.control.EventStore;
-import org.ulpgc.dacd.control.FileEventStore;
-import org.ulpgc.dacd.control.Subscriber;
+import org.ulpgc.dacd.control.persistence.EventStore;
+import org.ulpgc.dacd.control.persistence.FileEventStore;
+import org.ulpgc.dacd.control.subscriber.Subscriber;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +9,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
+
         EventStore fileStore = new FileEventStore("eventstore");
 
         Subscriber newsSubscriber = new Subscriber(

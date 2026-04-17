@@ -20,10 +20,8 @@ public class NewsPublisher implements NewsStore {
 
     @Override
     public void store(List<NewsArticle> articles) {
-        try {
-            ConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
-            Connection connection = factory.createConnection();
-            connection.start();
+        try (Connection connection = createConnection()){
+
 
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = session.createTopic(topicName);
@@ -35,10 +33,16 @@ public class NewsPublisher implements NewsStore {
                 producer.send(message);
             }
 
-            session.close();
-            connection.close();
+
         } catch (JMSException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Connection createConnection() throws JMSException {
+        ConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
+        Connection connection = factory.createConnection();
+        connection.start();
+        return connection;
     }
 }

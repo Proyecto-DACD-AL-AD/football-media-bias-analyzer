@@ -11,9 +11,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-        if(System.getenv("API_TOKEN") == null
-                || System.getenv("API_TOKEN").trim().isEmpty()) {
-            System.out.println("La variable de entorno API_TOKEN no está configurada");
+        if(System.getenv("API_TOKEN") == null || System.getenv("API_TOKEN").trim().isEmpty()) {
+            System.err.println("La variable de entorno API_TOKEN no está configurada");
             System.exit(1);
         }
 
@@ -24,12 +23,8 @@ public class Main {
         Controller controller = new Controller(apiFeeder, matchFilter, matchStorer);
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        System.out.println("Iniciando el recolector de partidos de fútbol...");
 
-        Runnable feedingTask = () -> {
-            System.out.println("\n--- Iniciando ciclo de actualización ---");
-            controller.start();
-        };
-
-        scheduler.scheduleAtFixedRate(feedingTask, 0, 1, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(controller::start, 0, 12, TimeUnit.HOURS);
     }
 }

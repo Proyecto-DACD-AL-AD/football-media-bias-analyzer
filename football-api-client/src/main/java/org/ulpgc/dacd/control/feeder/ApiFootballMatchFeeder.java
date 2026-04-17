@@ -13,13 +13,13 @@ public class ApiFootballMatchFeeder implements FootballMatchFeeder {
     private static final String BASE_URL = "https://api.football-data.org/v4/competitions/2014/";
     private final HttpClient client = HttpClient.newHttpClient();
 
-
+    @Override
     public String getAllMatches() throws IOException, InterruptedException {
         String matchesUrl = BASE_URL + "matches?season=2025";
         return makeApiCall(matchesUrl);
     }
 
-
+    @Override
     public String getStandingsByMatchday (int matchday) throws IOException, InterruptedException {
         String standingsUrl = BASE_URL + "standings?season=2025&matchday=" + matchday;
         return makeApiCall(standingsUrl);

@@ -1,5 +1,7 @@
 package org.ulpgc.dacd.control;
 
+import org.ulpgc.dacd.control.subscriber.Subscriber;
+
 import java.util.List;
 
 public class Controller {
@@ -11,9 +13,8 @@ public class Controller {
     }
 
     public void start() {
-        System.out.println("Iniciando el Controller del Event Store Builder...");
         for (Subscriber subscriber : subscribers) {
-            subscriber.start();
+            subscriber.startConsuming();
         }
     }
 }
