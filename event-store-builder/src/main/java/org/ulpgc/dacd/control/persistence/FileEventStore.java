@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.control;
+package org.ulpgc.dacd.control.persistence;
 
 import java.io.File;
 import java.io.FileWriter;

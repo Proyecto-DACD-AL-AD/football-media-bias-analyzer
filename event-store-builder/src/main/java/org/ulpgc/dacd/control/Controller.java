@@ -1,5 +1,7 @@
 package org.ulpgc.dacd.control;
 
+import org.ulpgc.dacd.control.subscriber.Subscriber;
+
 import java.util.List;
 
 public class Controller {

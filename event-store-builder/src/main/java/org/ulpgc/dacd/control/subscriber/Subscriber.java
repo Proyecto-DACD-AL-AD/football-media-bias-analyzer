@@ -1,7 +1,8 @@
-package org.ulpgc.dacd.control;
+package org.ulpgc.dacd.control.subscriber;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import jakarta.jms.*;
+import org.ulpgc.dacd.control.persistence.EventStore;
 
 public class Subscriber {
 
