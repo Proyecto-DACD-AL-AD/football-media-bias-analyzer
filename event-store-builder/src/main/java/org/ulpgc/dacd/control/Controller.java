@@ -13,9 +13,8 @@ public class Controller {
     }
 
     public void start() {
-        System.out.println("Iniciando el Controller del Event Store Builder...");
         for (Subscriber subscriber : subscribers) {
-            subscriber.start();
+            subscriber.startConsuming();
         }
     }
 }
