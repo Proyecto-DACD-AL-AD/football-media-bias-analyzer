@@ -10,12 +10,12 @@ import java.util.List;
 public class NewsPublisher implements NewsStore {
     private final String brokerUrl;
     private final String topicName;
-    private final Gson gson;
+    private final Gson serializer;
 
     public NewsPublisher(String brokerUrl, String topicName) {
         this.brokerUrl = brokerUrl;
         this.topicName = topicName;
-        this.gson = EventSerializer.create();
+        this.serializer = EventSerializer.create();
     }
 
     @Override
@@ -28,7 +28,7 @@ public class NewsPublisher implements NewsStore {
             MessageProducer producer = session.createProducer(destination);
 
             for (NewsArticle article : articles) {
-                String json = gson.toJson(article);
+                String json = serializer.toJson(article);
                 TextMessage message = session.createTextMessage(json);
                 producer.send(message);
             }

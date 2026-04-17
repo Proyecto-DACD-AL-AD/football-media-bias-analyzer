@@ -10,12 +10,12 @@ public class FootballMatchPublisher implements FootballMatchStore {
 
     private final String brokerUrl;
     private final String topicName;
-    private final Gson gson;
+    private final Gson serializer;
 
     public FootballMatchPublisher(String brokerUrl, String topicName) {
         this.brokerUrl = brokerUrl;
         this.topicName = topicName;
-        this.gson = EventSerializer.create();
+        this.serializer = EventSerializer.create();
     }
 
     @Override
@@ -28,7 +28,7 @@ public class FootballMatchPublisher implements FootballMatchStore {
             MessageProducer producer = session.createProducer(destination);
 
             for (Match match: matches) {
-                String jsonEvent = gson.toJson(match);
+                String jsonEvent = serializer.toJson(match);
                 TextMessage message = session.createTextMessage(jsonEvent);
                 producer.send(message);
             }
