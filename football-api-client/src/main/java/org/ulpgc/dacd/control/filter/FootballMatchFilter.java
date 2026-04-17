@@ -51,7 +51,7 @@ public class FootballMatchFilter {
             JsonObject fullTime = matchJson.getAsJsonObject("score").getAsJsonObject("fullTime");
             int homeGoals = fullTime.get("home").getAsInt();
             int awayGoals = fullTime.get("away").getAsInt();
-            String ss = "football-match-feeder";
+            String ss = "football-api";
             Instant ts = Instant.now();
 
             Match match = new Match(date, matchday, homeTeam, awayTeam, homeGoals, awayGoals, 0, 0, ss, ts);

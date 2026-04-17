@@ -1,15 +1,19 @@
 package org.ulpgc.dacd.control;
 
+import java.util.List;
+
 public class Controller {
 
-    private final Subscriber subscriber;
+    private final List<Subscriber> subscribers;
 
-    public Controller(Subscriber subscriber) {
-        this.subscriber = subscriber;
+    public Controller(List<Subscriber> subscribers) {
+        this.subscribers = subscribers;
     }
 
     public void start() {
         System.out.println("Iniciando el Controller del Event Store Builder...");
-        subscriber.start();
+        for (Subscriber subscriber : subscribers) {
+            subscriber.start();
+        }
     }
 }
