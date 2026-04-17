@@ -58,7 +58,7 @@ public class RssScraper implements NewsScraper {
     }
 
     protected NewsArticle parseArticle(Element item, String teamName) {
-        String ss = "news-feeder";
+        String ss = "rss-scraper";
         Instant ts = Instant.now();
 
         return new NewsArticle(
