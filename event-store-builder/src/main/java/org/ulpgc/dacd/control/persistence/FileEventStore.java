@@ -25,8 +25,8 @@ public class FileEventStore implements EventStore {
                 metadata.getSourceSystem();
 
         File directory = new File(directoryPath);
-        if (!directory.exists()) {
-            directory.mkdirs();
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new RuntimeException("No se pudo crear el directorio: " + directoryPath);
         }
 
         return directoryPath + File.separator + metadata.getFormattedDate() + ".events";
