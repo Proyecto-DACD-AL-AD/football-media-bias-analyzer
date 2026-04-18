@@ -2,16 +2,17 @@ package org.ulpgc.dacd.control.subscriber;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import jakarta.jms.*;
-import org.ulpgc.dacd.control.persistence.FileEventStore;
+import org.ulpgc.dacd.control.persistence.EventStore;
+
 
 public class Subscriber {
 
     private final String brokerUrl;
     private final String topicName;
     private final String clientId;
-    private final FileEventStore store;
+    private final EventStore store;
 
-    public Subscriber(String brokerUrl, String topicName, String clientId, FileEventStore store) {
+    public Subscriber(String brokerUrl, String topicName, String clientId, EventStore store) {
         this.brokerUrl = brokerUrl;
         this.topicName = topicName;
         this.clientId = clientId;
