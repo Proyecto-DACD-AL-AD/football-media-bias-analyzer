@@ -1,10 +1,19 @@
 package org.ulpgc.dacd.control.persistence;
 
+import com.google.gson.JsonObject;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class FileEventStore implements EventStore {
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
+            .ofPattern("yyyyMMdd")
+            .withZone(ZoneId.of("UTC"));
 
     private final String baseDirectory;
 
@@ -13,23 +22,27 @@ public class FileEventStore implements EventStore {
     }
 
     @Override
-    public void save(String topic, String eventJson) {
-        EventDeserializer metadata = new EventDeserializer(eventJson);
-        String path = buildPath(topic, metadata);
-        writeToDisk(path, eventJson);
+    public void save(String topic, JsonObject event) {
+        String path = buildPath(topic, event);
+        writeToDisk(path, event.toString());
     }
 
-    private String buildPath(String topic, EventDeserializer metadata) {
+    private String buildPath(String topic, JsonObject event) {
+        String ss = event.get("ss").getAsString();
+        String tsString = event.get("ts").getAsString();
+        Instant timestamp = Instant.parse(tsString);
+        String formattedDate = DATE_FORMATTER.format(timestamp);
+
         String directoryPath = baseDirectory + File.separator +
                 topic + File.separator +
-                metadata.getSourceSystem();
+                ss;
 
         File directory = new File(directoryPath);
         if (!directory.exists() && !directory.mkdirs()) {
             throw new RuntimeException("No se pudo crear el directorio: " + directoryPath);
         }
 
-        return directoryPath + File.separator + metadata.getFormattedDate() + ".events";
+        return directoryPath + File.separator + formattedDate + ".events";
     }
 
     private void writeToDisk(String filePath, String content) {
