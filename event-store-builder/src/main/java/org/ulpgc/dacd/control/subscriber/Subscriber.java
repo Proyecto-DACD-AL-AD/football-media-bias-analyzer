@@ -1,31 +1,28 @@
 package org.ulpgc.dacd.control.subscriber;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import jakarta.jms.*;
-import org.ulpgc.dacd.control.persistence.EventStore;
 
+import java.util.function.BiConsumer;
 
 public class Subscriber {
 
-    private final String brokerUrl;
+    private final Connection connection;
     private final String topicName;
-    private final String clientId;
-    private final EventStore store;
+    private final String subscriptionId;
 
-    public Subscriber(String brokerUrl, String topicName, String clientId, EventStore store) {
-        this.brokerUrl = brokerUrl;
+    public Subscriber(Connection connection, String topicName, String subscriptionId) {
+        this.connection = connection;
         this.topicName = topicName;
-        this.clientId = clientId;
-        this.store = store;
+        this.subscriptionId = subscriptionId;
     }
 
-    public void startConsuming() {
+    public void startConsuming(BiConsumer<String, JsonObject> eventConsumer) {
         try {
-            Connection connection = createConnection();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Topic topic = session.createTopic(topicName);
-
-            MessageConsumer consumer = session.createDurableSubscriber(topic, clientId + "-sub");
+            MessageConsumer consumer = session.createDurableSubscriber(topic, subscriptionId);
 
             System.out.println("Suscrito a '" + topicName + "' de forma durable. Esperando eventos...");
 
@@ -33,8 +30,8 @@ public class Subscriber {
                 try {
                     if (message instanceof TextMessage textMessage) {
                         String json = textMessage.getText();
-
-                        store.save(topicName, json);
+                        JsonObject event = JsonParser.parseString(json).getAsJsonObject();
+                        eventConsumer.accept(topicName, event);
                     }
                 } catch (JMSException e) {
                     System.err.println("Error al leer el mensaje: " + e.getMessage());
@@ -42,16 +39,7 @@ public class Subscriber {
             });
 
         } catch (JMSException e) {
-            System.err.println("Error de conexión con ActiveMQ: " + e.getMessage());
+            System.err.println("Error configurando el suscriptor para " + topicName + ": " + e.getMessage());
         }
-    }
-
-    private Connection createConnection() throws JMSException {
-        ConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
-        Connection connection = factory.createConnection();
-
-        connection.setClientID(clientId);
-        connection.start();
-        return connection;
     }
 }

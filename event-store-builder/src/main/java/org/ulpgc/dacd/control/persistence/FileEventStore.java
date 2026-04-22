@@ -1,5 +1,7 @@
 package org.ulpgc.dacd.control.persistence;
 
+import com.google.gson.JsonObject;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,10 +15,10 @@ public class FileEventStore implements EventStore {
     }
 
     @Override
-    public void save(String topic, String eventJson) {
-        EventDeserializer metadata = new EventDeserializer(eventJson);
+    public void save(String topic, JsonObject event) {
+        EventDeserializer metadata = new EventDeserializer(event);
         String path = buildPath(topic, metadata);
-        writeToDisk(path, eventJson);
+        writeToDisk(path, event.toString());
     }
 
     private String buildPath(String topic, EventDeserializer metadata) {

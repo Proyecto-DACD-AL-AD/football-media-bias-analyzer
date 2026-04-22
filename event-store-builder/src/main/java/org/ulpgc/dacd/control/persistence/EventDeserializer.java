@@ -1,7 +1,6 @@
 package org.ulpgc.dacd.control.persistence;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -15,8 +14,8 @@ public class EventDeserializer {
 
     private final JsonObject jsonObject;
 
-    public EventDeserializer(String eventJson) {
-        this.jsonObject = JsonParser.parseString(eventJson).getAsJsonObject();
+    public EventDeserializer(JsonObject jsonObject) {
+        this.jsonObject = jsonObject;
     }
 
     public String getSourceSystem() {
