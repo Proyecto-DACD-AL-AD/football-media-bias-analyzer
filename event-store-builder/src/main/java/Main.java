@@ -2,10 +2,10 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
-import org.ulpgc.dacd.control.Controller;
-import org.ulpgc.dacd.control.persistence.EventStore;
-import org.ulpgc.dacd.control.persistence.FileEventStore;
-import org.ulpgc.dacd.control.subscriber.Subscriber;
+import org.ulpgc.dacd.eventstore.control.Controller;
+import org.ulpgc.dacd.eventstore.control.persistence.EventStore;
+import org.ulpgc.dacd.eventstore.control.persistence.FileEventStore;
+import org.ulpgc.dacd.eventstore.control.subscriber.Subscriber;
 
 import java.util.Arrays;
 import java.util.List;
