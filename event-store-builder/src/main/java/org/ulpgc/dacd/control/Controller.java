@@ -17,7 +17,7 @@ public class Controller {
 
     public void start() {
         for (Subscriber subscriber : subscribers) {
-            subscriber.startConsuming((t,o)->eventStore.save(t, o));
+            subscriber.startConsuming(eventStore::save);
         }
     }
 }

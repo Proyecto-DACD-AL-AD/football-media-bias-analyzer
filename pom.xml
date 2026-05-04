@@ -12,6 +12,7 @@
         <module>football-api-client</module>
         <module>rss-news-scraper</module>
         <module>event-store-builder</module>
+        <module>business-unit</module>
     </modules>
 
     <properties>
