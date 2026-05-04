@@ -1,8 +1,8 @@
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ulpgc.dacd.control.filter.FootballMatchFilter;
-import org.ulpgc.dacd.model.Match;
+import org.ulpgc.dacd.api.control.filter.FootballMatchFilter;
+import org.ulpgc.dacd.api.model.Match;
 
 import java.util.List;
 import java.util.Map;
