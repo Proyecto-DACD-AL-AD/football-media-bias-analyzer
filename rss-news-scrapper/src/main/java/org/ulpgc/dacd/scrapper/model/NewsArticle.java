@@ -4,6 +4,7 @@ import java.time.Instant;
 
 public record NewsArticle(
         String title,
+        String summary,
         String link,
         Instant pubDate,
         String source,

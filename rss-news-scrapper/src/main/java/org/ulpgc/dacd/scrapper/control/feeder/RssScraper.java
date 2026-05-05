@@ -61,8 +61,12 @@ public class RssScraper implements NewsScraper {
         String ss = "rss-scraper";
         Instant ts = Instant.now();
 
+        String rawDescription = extractText(item, "description");
+        String cleanSummary = cleanSummary(rawDescription);
+
         return new NewsArticle(
                 extractText(item, "title"),
+                cleanSummary,
                 extractText(item, "link"),
                 parseDate(extractText(item, "pubDate")),
                 sourceName,
@@ -83,5 +87,19 @@ public class RssScraper implements NewsScraper {
     private String extractText(Element item, String tag) {
         Element element = item.selectFirst(tag);
         return element != null ? element.text() : "";
+    }
+
+    private String cleanSummary(String rawSummary) {
+        if (rawSummary == null || rawSummary.isEmpty()) {
+            return "";
+        }
+
+        Document fragment = Jsoup.parseBodyFragment(rawSummary);
+        fragment.select("a, img").remove();
+
+        return fragment.text()
+                .replace("&nbsp;", " ")
+                .replace("\u00A0", " ")
+                .trim();
     }
 }
