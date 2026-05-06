@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 public class EventSerializer {
     public static Gson create() {
         return new GsonBuilder()
+                .setPrettyPrinting()
                 .registerTypeAdapter(Instant.class, (JsonSerializer<Instant>)
                         (src, typeOfSrc, context) ->
                                 new JsonPrimitive(DateTimeFormatter.ISO_INSTANT.format(src)))

@@ -55,8 +55,8 @@ public class FootballMatchPublisher implements FootballMatchStore {
             }
             saveLastDate(lastPublishedDate, dateUpdated);
             System.out.println("Se han enviado " + eventsPublishedCounter + " mensajes NUEVOS al topic: '" + topicName + "'...");
-        } catch (JMSException e) {
 
+        } catch (JMSException e) {
             System.err.println("Error al enviar el mensaje a ActiveMQ: " + e.getMessage());
         }
     }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ee3ea747-15fb-4488-b298-84b9437e8628" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/football-api-client/src/main/java/org/ulpgc/dacd/api/control/persistence/FootballMatchPublisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/football-api-client/src/main/java/org/ulpgc/dacd/api/control/persistence/FootballMatchPublisher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/last_date_football-matches.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/last_dates_news.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rss-news-scraper/src/main/java/org/ulpgc/dacd/scraper/control/persistence/EventSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/rss-news-scraper/src/main/java/org/ulpgc/dacd/scraper/control/persistence/EventSerializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rss-news-scraper/src/main/java/org/ulpgc/dacd/scraper/control/persistence/NewsPublisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/rss-news-scraper/src/main/java/org/ulpgc/dacd/scraper/control/persistence/NewsPublisher.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "aythamilorenzo"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Proyecto-DACD-AL-AD/sports-media-bias-analyzer.git",
+    "accountId": "a3d1ef33-4298-48d9-91c8-21cec5fc68e9"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="3DMn0QXyVhTDCS732gLthByY3V2" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main Matches.executor": "Run",
+    "Application.Main.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "fix/event-store"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Main Matches" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="ms-21" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <envs>
+        <env name="API_TOKEN" value="1cd2e7335d854f91aa6e3ba4defef801" />
+      </envs>
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="football-api-client" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ee3ea747-15fb-4488-b298-84b9437e8628" name="Changes" comment="" />
+      <created>1778100584182</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1778100584182</updated>
+    </task>
+    <servers />
+  </component>
+</project>

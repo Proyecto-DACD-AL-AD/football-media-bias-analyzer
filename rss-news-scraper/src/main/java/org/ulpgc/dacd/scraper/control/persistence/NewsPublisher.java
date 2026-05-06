@@ -25,7 +25,7 @@ public class NewsPublisher implements NewsStore {
         this.brokerUrl = brokerUrl;
         this.topicName = topicName;
         this.serializer = EventSerializer.create();
-        this.watermarkFile = Paths.get("last_dates_" + topicName + ".txt");
+        this.watermarkFile = Paths.get("last_dates_" + topicName + ".json");
         this.lastPublishedDates = loadLastDates();
     }
 
@@ -76,27 +76,28 @@ public class NewsPublisher implements NewsStore {
         Map<String, Instant> newsPaperDatesMap = new HashMap<>();
         try {
             if (Files.exists(watermarkFile)) {
-                List<String> lines = Files.readAllLines(watermarkFile);
-                for (String line : lines) {
-                    String[] parts = line.split("=");
-                    if (parts.length == 2) {
-                        newsPaperDatesMap.put(parts[0], Instant.parse(parts[1]));
+                String json = Files.readString(watermarkFile);
+                java.lang.reflect.Type stringMapType = new com.google.gson.reflect.TypeToken<Map<String, String>>(){}.getType();
+                Map<String, String> rawMap = serializer.fromJson(json, stringMapType);
+                if (rawMap != null) {
+                    for (Map.Entry<String, String> entry : rawMap.entrySet()) {
+                        newsPaperDatesMap.put(entry.getKey(), Instant.parse(entry.getValue()));
                     }
                 }
             }
         } catch (Exception e) {
-            System.err.println("No se pudo leer el chivato de noticias. Procesando todo desde cero.");
+            System.err.println("Error real leyendo el chivato: " + e.getMessage());
+            e.printStackTrace();
         }
         return newsPaperDatesMap;
     }
 
     private void saveLastDates(boolean datesUpdated) {
         try {
-            if(datesUpdated) {
-                List<String> lines = lastPublishedDates.entrySet().stream()
-                        .map(entry -> entry.getKey() + "=" + entry.getValue().toString())
-                        .toList();
-                Files.write(watermarkFile, lines); }
+            if (datesUpdated) {
+                String json = serializer.toJson(lastPublishedDates);
+                Files.writeString(watermarkFile, json);
+            }
         } catch (Exception e) {
             System.err.println("Error escribiendo el chivato de noticias: " + e.getMessage());
         }
