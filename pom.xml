@@ -10,8 +10,9 @@
     <packaging>pom</packaging>
     <modules>
         <module>football-api-client</module>
-        <module>rss-news-scraper</module>
+        <module>rss-news-scrapper</module>
         <module>event-store-builder</module>
+        <module>business-unit</module>
     </modules>
 
     <properties>
