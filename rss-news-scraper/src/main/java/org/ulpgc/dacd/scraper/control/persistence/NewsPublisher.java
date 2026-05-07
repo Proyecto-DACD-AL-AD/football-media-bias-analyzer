@@ -2,6 +2,9 @@ package org.ulpgc.dacd.scraper.control.persistence;
 
 import com.google.gson.Gson;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.ulpgc.dacd.scraper.control.api.HuggingFaceClient;
+import org.ulpgc.dacd.scraper.control.api.SentimentParser;
+import org.ulpgc.dacd.scraper.control.config.TokenLoader;
 import org.ulpgc.dacd.scraper.model.NewsArticle;
 
 import jakarta.jms.*;
@@ -9,10 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NewsPublisher implements NewsStore {
     private final String brokerUrl;
@@ -20,6 +20,9 @@ public class NewsPublisher implements NewsStore {
     private final Gson serializer;
     private final Path watermarkFile;
     private final Map<String, Instant> lastPublishedDates;
+    private final HuggingFaceClient sentimentClient;
+    private final Set<String> publishedUrls;
+    private final Map<String, Double> sentimentCache;
 
     public NewsPublisher(String brokerUrl, String topicName) {
         this.brokerUrl = brokerUrl;
@@ -27,11 +30,15 @@ public class NewsPublisher implements NewsStore {
         this.serializer = EventSerializer.create();
         this.watermarkFile = Paths.get("state/last_dates_" + topicName + ".json");
         this.lastPublishedDates = loadLastDates();
+        this.publishedUrls = new HashSet<>();
+        this.sentimentCache = new HashMap<>();
+
+        String sentimentToken = TokenLoader.loadKey("hf.api.key.sentiment");
+        this.sentimentClient = new HuggingFaceClient(sentimentToken);
     }
 
     @Override
     public void store(List<NewsArticle> articles) {
-
         articles.sort(Comparator.comparing(NewsArticle::pubDate));
 
         try (Connection connection = createConnection()) {
@@ -49,17 +56,50 @@ public class NewsPublisher implements NewsStore {
                 Instant lastDateForKey = lastPublishedDates.getOrDefault(key, Instant.EPOCH);
 
                 if (articleDate.isAfter(lastDateForKey)) {
-                    String json = serializer.toJson(article);
+                    if (publishedUrls.contains(article.link())) {
+                        continue;
+                    }
+
+                    String textToAnalyze = (article.title() + ". " + article.summary()).trim();
+                    double sentimentScore = 0.0;
+
+                    if (!textToAnalyze.equals(".")) {
+                        if (sentimentCache.containsKey(article.link())) {
+                            sentimentScore = sentimentCache.get(article.link());
+                        } else {
+                            String sentimentJson = sentimentClient.analyze(textToAnalyze, "cardiffnlp/twitter-xlm-roberta-base-sentiment");
+                            sentimentScore = SentimentParser.parse(sentimentJson);
+                            sentimentCache.put(article.link(), sentimentScore);
+                        }
+                    }
+
+                    NewsArticle scoredArticle = new NewsArticle(
+                            article.title(),
+                            article.summary(),
+                            article.link(),
+                            article.pubDate(),
+                            article.source(),
+                            article.team(),
+                            sentimentScore,
+                            article.ss(),
+                            article.ts()
+                    );
+
+                    String json = serializer.toJson(scoredArticle);
                     TextMessage message = session.createTextMessage(json);
                     producer.send(message);
 
                     lastPublishedDates.put(key, articleDate);
+                    publishedUrls.add(article.link());
                     datesUpdated = true;
                     eventsPublishedCounter++;
                 }
             }
             saveLastDates(datesUpdated);
-            System.out.println("Se han enviado " + eventsPublishedCounter + " noticias NUEVAS al topic: '" + topicName + "'...");
+
+            if (eventsPublishedCounter > 0) {
+                System.out.println("Se han enviado " + eventsPublishedCounter + " noticias NUEVAS al topic: '" + topicName + "'...");
+            }
 
         } catch (JMSException e) {
             System.err.println("Error al enviar a ActiveMQ: " + e.getMessage());
