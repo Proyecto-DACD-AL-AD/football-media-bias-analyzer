@@ -1,30 +1,30 @@
 package org.ulpgc.dacd.businessunit.control;
 
 import org.ulpgc.dacd.businessunit.control.subscriber.Subscriber;
+import org.ulpgc.dacd.businessunit.control.persistence.SentimentRepository;
 import com.google.gson.JsonObject;
 
 public class Controller {
     private final Subscriber newsSubscriber;
     private final Subscriber matchesSubscriber;
+    private final SentimentRepository sentimentRepository;
 
-    public Controller(Subscriber newsSubscriber, Subscriber matchesSubscriber) {
+    public Controller(Subscriber newsSubscriber, Subscriber matchesSubscriber, SentimentRepository sentimentRepository) {
         this.newsSubscriber = newsSubscriber;
         this.matchesSubscriber = matchesSubscriber;
+        this.sentimentRepository = sentimentRepository;
     }
 
     public void start() {
-        System.out.println("Arrancando la Business Unit...");
-
         newsSubscriber.startConsuming(this::processNews);
         matchesSubscriber.startConsuming(this::processMatch);
     }
 
-
-    private void processNews(String topic, JsonObject json) {
-        System.out.println("[NOTICIA RECIBIDA]: " + json.get("ss").getAsString());
+    public void processNews(String topic, JsonObject json) {
+        sentimentRepository.save(json);
     }
 
-    private void processMatch(String topic, JsonObject json) {
-        System.out.println("[PARTIDO RECIBIDO]: " + json.get("ss").getAsString());
+    public void processMatch(String topic, JsonObject json) {
+        // Completar con la parte de los partidos
     }
 }
