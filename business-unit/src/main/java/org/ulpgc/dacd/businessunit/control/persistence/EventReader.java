@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.businessunit.control;
+package org.ulpgc.dacd.businessunit.control.persistence;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

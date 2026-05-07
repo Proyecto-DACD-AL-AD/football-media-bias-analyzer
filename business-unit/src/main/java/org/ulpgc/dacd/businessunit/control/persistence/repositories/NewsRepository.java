@@ -1,19 +1,52 @@
-package org.ulpgc.dacd.businessunit.control.persistence;
+package org.ulpgc.dacd.businessunit.control.persistence.repositories;
 
 import com.google.gson.JsonObject;
+import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
 import java.sql.*;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-public class SentimentRepository {
+public class NewsRepository implements EventRepository {
     private final DatabaseManager dbManager;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.of("UTC"));
 
-    public SentimentRepository(DatabaseManager dbManager) {
+    public NewsRepository(DatabaseManager dbManager) {
         this.dbManager = dbManager;
     }
 
+    @Override
+    public void initTables() {
+        String createProcessedNewsTable = """
+                CREATE TABLE IF NOT EXISTS processed_news (
+                    url TEXT,
+                    team TEXT,
+                    inserted_at TEXT,
+                    PRIMARY KEY (url, team)
+                );
+                """;
+
+        String createDailySentimentTable = """
+                CREATE TABLE IF NOT EXISTS daily_sentiment (
+                    date TEXT,
+                    team TEXT,
+                    source TEXT,
+                    news_count INTEGER,
+                    avg_sentiment REAL,
+                    PRIMARY KEY (date, team, source)
+                );
+                """;
+
+        try (Connection conn = dbManager.connect();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(createProcessedNewsTable);
+            stmt.execute(createDailySentimentTable);
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    @Override
     public void save(JsonObject articleJson) {
         String link = articleJson.get("link").getAsString();
         String team = articleJson.get("team").getAsString();
