@@ -4,8 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ee3ea747-15fb-4488-b298-84b9437e8628" name="Changes" comment="fix: Changes from .txt format to .json the file which saves the last dates of the news to avoid the duplicate events">
+    <list default="true" id="ee3ea747-15fb-4488-b298-84b9437e8628" name="Changes" comment="Add the description of each news item to the scrapers and events it saves">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/football-api-client/src/main/java/org/ulpgc/dacd/api/control/persistence/FootballMatchPublisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/football-api-client/src/main/java/org/ulpgc/dacd/api/control/persistence/FootballMatchPublisher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/last_date_football-matches.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/last_dates_news.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rss-news-scraper/src/main/java/org/ulpgc/dacd/scraper/control/persistence/NewsPublisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/rss-news-scraper/src/main/java/org/ulpgc/dacd/scraper/control/persistence/NewsPublisher.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,37 +20,40 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "aythamilorenzo"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;aythamilorenzo&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Proyecto-DACD-AL-AD/sports-media-bias-analyzer.git",
-    "accountId": "a3d1ef33-4298-48d9-91c8-21cec5fc68e9"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Proyecto-DACD-AL-AD/sports-media-bias-analyzer.git&quot;,
+    &quot;accountId&quot;: &quot;a3d1ef33-4298-48d9-91c8-21cec5fc68e9&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 5
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="3DMn0QXyVhTDCS732gLthByY3V2" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main Matches.executor": "Run",
-    "Application.Main.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "fix/event-store"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main Matches.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;fix/event-store&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Main Matches" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="ms-21" />
@@ -78,6 +86,17 @@
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fix: Changes from .txt format to .json the file which saves the last dates of the news to avoid the duplicate events" />

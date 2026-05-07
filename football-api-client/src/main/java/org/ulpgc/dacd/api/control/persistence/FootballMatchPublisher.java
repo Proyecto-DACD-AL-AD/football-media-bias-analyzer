@@ -24,7 +24,7 @@ public class FootballMatchPublisher implements FootballMatchStore {
         this.brokerUrl = brokerUrl;
         this.topicName = topicName;
         this.serializer = EventSerializer.create();
-        this.watermarkFile = Paths.get("last_date_" + topicName + ".txt");
+        this.watermarkFile = Paths.get("state/last_date_" + topicName + ".txt");
         this.lastPublishedDate = loadLastDate();
     }
 
@@ -75,14 +75,19 @@ public class FootballMatchPublisher implements FootballMatchStore {
                 return Instant.parse(dateStr);
             }
         } catch (Exception e) {
-            System.err.println("No se pudo leer el chivato. Procesando todo desde cero.");
+            System.err.println("Error leyendo el watermark: " + e.getMessage());
         }
         return Instant.EPOCH;
     }
 
     private void saveLastDate(Instant date, boolean dateUpdated) {
         try {
-            if(dateUpdated){ Files.writeString(watermarkFile, date.toString());}
+            if(dateUpdated){
+                if (watermarkFile.getParent() != null) {
+                    Files.createDirectories(watermarkFile.getParent());
+                }
+                Files.writeString(watermarkFile, date.toString());
+            }
         } catch (Exception e) {
             System.err.println("Error writing the date: " + e.getMessage());
         }

@@ -25,7 +25,7 @@ public class NewsPublisher implements NewsStore {
         this.brokerUrl = brokerUrl;
         this.topicName = topicName;
         this.serializer = EventSerializer.create();
-        this.watermarkFile = Paths.get("last_dates_" + topicName + ".json");
+        this.watermarkFile = Paths.get("state/last_dates_" + topicName + ".json");
         this.lastPublishedDates = loadLastDates();
     }
 
@@ -44,15 +44,16 @@ public class NewsPublisher implements NewsStore {
 
             for (NewsArticle article : articles) {
                 Instant articleDate = article.pubDate();
-                String source = article.source();
-                Instant lastDateForSource = lastPublishedDates.getOrDefault(source, Instant.EPOCH);
+                String key = article.source() + "-" + article.team();
 
-                if (articleDate.isAfter(lastDateForSource)) {
+                Instant lastDateForKey = lastPublishedDates.getOrDefault(key, Instant.EPOCH);
+
+                if (articleDate.isAfter(lastDateForKey)) {
                     String json = serializer.toJson(article);
                     TextMessage message = session.createTextMessage(json);
                     producer.send(message);
 
-                    lastPublishedDates.put(source, articleDate);
+                    lastPublishedDates.put(key, articleDate);
                     datesUpdated = true;
                     eventsPublishedCounter++;
                 }
@@ -86,8 +87,7 @@ public class NewsPublisher implements NewsStore {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error real leyendo el chivato: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error leyendo el watermark: " + e.getMessage());
         }
         return newsPaperDatesMap;
     }
@@ -95,6 +95,9 @@ public class NewsPublisher implements NewsStore {
     private void saveLastDates(boolean datesUpdated) {
         try {
             if (datesUpdated) {
+                if (watermarkFile.getParent() != null) {
+                    Files.createDirectories(watermarkFile.getParent());
+                }
                 String json = serializer.toJson(lastPublishedDates);
                 Files.writeString(watermarkFile, json);
             }
