@@ -47,3 +47,7 @@ build/
 
 # Ignorar la carpeta de estados de los feeders
 state/
+
+# Ignorar bases de datos SQLite
+*.db
+datamart/datamart.db
