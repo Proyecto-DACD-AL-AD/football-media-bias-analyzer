@@ -73,16 +73,11 @@ public class RssScraper implements NewsScraper {
         String cleanSummary = cleanSummary(rawDescription);
 
         String textToAnalyze = (title + ". " + cleanSummary).trim();
+        double finalSentimentScore = 0.0;
 
         if (!textToAnalyze.equals(".")) {
-            System.out.println("Analizando noticia: " + title);
-
             String sentimentJson = sentimentClient.analyze(textToAnalyze, "cardiffnlp/twitter-xlm-roberta-base-sentiment");
-            double finalSentimentScore = SentimentParser.parse(sentimentJson);
-            System.out.println("  -> JSON Sentimiento: " + sentimentJson);
-            System.out.println("  -> Puntuación sentimiento: " + finalSentimentScore);
-
-            System.out.println("---------------------------------------------------");
+            finalSentimentScore = SentimentParser.parse(sentimentJson);
         }
 
         return new NewsArticle(
@@ -92,6 +87,7 @@ public class RssScraper implements NewsScraper {
                 parseDate(extractText(item, "pubDate")),
                 sourceName,
                 teamName,
+                finalSentimentScore,
                 ss,
                 ts
         );

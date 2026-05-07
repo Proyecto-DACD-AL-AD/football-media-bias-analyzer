@@ -9,6 +9,7 @@ public record NewsArticle(
         Instant pubDate,
         String source,
         String team,
+        Double sentimentScore,
         String ss,
         Instant ts
 ) {
