@@ -2,13 +2,25 @@
   "sourceName": "Marca",
   "baseUrl": "https://objetos.estaticos-marca.com/rss/futbol/%s.xml",
   "teamUrlNames": {
-    "Real Madrid CF": "real-madrid",
     "FC Barcelona": "barcelona",
+    "Villarreal CF": "villarreal",
+    "Real Madrid CF": "real-madrid",
+    "Club Atlético de Madrid": "atletico",
+    "RCD Espanyol de Barcelona": "espanyol",
     "Real Betis Balompié": "betis",
+    "Athletic Club": "athletic",
+    "Getafe CF": "getafe",
+    "Elche CF": "elche",
+    "RC Celta de Vigo": "celta",
+    "Deportivo Alavés": "alaves",
+    "Rayo Vallecano de Madrid": "rayo",
     "Sevilla FC": "sevilla",
     "Real Sociedad de Fútbol": "real-sociedad",
-    "Athletic Club": "athletic",
-    "Villarreal CF": "villarreal",
-    "Club Atlético de Madrid": "atletico"
+    "CA Osasuna": "osasuna",
+    "Valencia CF": "valencia",
+    "RCD Mallorca": "mallorca",
+    "Girona FC": "girona",
+    "Real Oviedo": "oviedo",
+    "Levante UD": "levante"
   }
 }
