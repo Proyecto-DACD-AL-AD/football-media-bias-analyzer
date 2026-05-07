@@ -1,7 +1,7 @@
-package org.ulpgc.dacd.scrapper.control.feeder;
+package org.ulpgc.dacd.scraper.control.feeder;
 
 import java.util.List;
-import org.ulpgc.dacd.scrapper.model.NewsArticle;
+import org.ulpgc.dacd.scraper.model.NewsArticle;
 
 public interface NewsScraper {
     List<NewsArticle> feed(String teamName);

@@ -39,3 +39,6 @@ build/
 
 # Ignorar Event Store local
 *.events
+
+# Ignorar la carpeta de estados de los feeders
+state/

@@ -1,10 +1,10 @@
-package org.ulpgc.dacd.scrapper.control.feeder;
+package org.ulpgc.dacd.scraper.control.feeder;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.ulpgc.dacd.scrapper.model.NewsArticle;
+import org.ulpgc.dacd.scraper.model.NewsArticle;
 
 import java.io.IOException;
 import java.time.Instant;

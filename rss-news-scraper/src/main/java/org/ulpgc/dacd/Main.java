@@ -1,11 +1,11 @@
 package org.ulpgc.dacd;
 
-import org.ulpgc.dacd.scrapper.control.Controller;
-import org.ulpgc.dacd.scrapper.control.feeder.NewsScraper;
-import org.ulpgc.dacd.scrapper.control.feeder.RssScraper;
-import org.ulpgc.dacd.scrapper.control.persistence.NewsPublisher;
-import org.ulpgc.dacd.scrapper.control.persistence.NewsStore;
-import org.ulpgc.dacd.scrapper.control.config.TeamLoader;
+import org.ulpgc.dacd.scraper.control.Controller;
+import org.ulpgc.dacd.scraper.control.feeder.NewsScraper;
+import org.ulpgc.dacd.scraper.control.feeder.RssScraper;
+import org.ulpgc.dacd.scraper.control.persistence.NewsPublisher;
+import org.ulpgc.dacd.scraper.control.persistence.NewsStore;
+import org.ulpgc.dacd.scraper.control.config.TeamLoader;
 
 import java.util.Arrays;
 import java.util.List;

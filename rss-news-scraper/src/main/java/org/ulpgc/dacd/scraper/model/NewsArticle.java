@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.scrapper.model;
+package org.ulpgc.dacd.scraper.model;
 
 import java.time.Instant;
 

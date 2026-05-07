@@ -1,8 +1,8 @@
-package org.ulpgc.dacd.scrapper.control;
+package org.ulpgc.dacd.scraper.control;
 
-import org.ulpgc.dacd.scrapper.model.NewsArticle;
-import org.ulpgc.dacd.scrapper.control.persistence.NewsStore;
-import org.ulpgc.dacd.scrapper.control.feeder.NewsScraper;
+import org.ulpgc.dacd.scraper.model.NewsArticle;
+import org.ulpgc.dacd.scraper.control.persistence.NewsStore;
+import org.ulpgc.dacd.scraper.control.feeder.NewsScraper;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.scrapper.control.persistence;
+package org.ulpgc.dacd.scraper.control.persistence;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 public class EventSerializer {
     public static Gson create() {
         return new GsonBuilder()
+                .setPrettyPrinting()
                 .registerTypeAdapter(Instant.class, (JsonSerializer<Instant>)
                         (src, typeOfSrc, context) ->
                                 new JsonPrimitive(DateTimeFormatter.ISO_INSTANT.format(src)))

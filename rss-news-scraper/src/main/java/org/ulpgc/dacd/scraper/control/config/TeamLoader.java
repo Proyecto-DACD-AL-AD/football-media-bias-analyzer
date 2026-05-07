@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.scrapper.control.config;
+package org.ulpgc.dacd.scraper.control.config;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

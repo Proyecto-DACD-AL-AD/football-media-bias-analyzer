@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.scrapper.control.feeder;
+package org.ulpgc.dacd.scraper.control.feeder;
 
 import java.util.Map;
 
