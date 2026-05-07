@@ -4,6 +4,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.ulpgc.dacd.scraper.control.api.HuggingFaceClient;
+import org.ulpgc.dacd.scraper.control.api.SentimentParser;
+import org.ulpgc.dacd.scraper.control.config.TokenLoader;
 import org.ulpgc.dacd.scraper.model.NewsArticle;
 
 import java.io.IOException;
@@ -18,6 +21,7 @@ public class RssScraper implements NewsScraper {
     private final String baseUrl;
     private final String sourceName;
     private final Map<String, String> teamUrlNames;
+    private final HuggingFaceClient sentimentClient;
 
     public RssScraper(String configFilePath) {
         try (java.io.Reader reader = new java.io.InputStreamReader(
@@ -29,6 +33,9 @@ public class RssScraper implements NewsScraper {
             this.baseUrl = config.baseUrl();
             this.sourceName = config.sourceName();
             this.teamUrlNames = config.teamUrlNames();
+
+            String sentimentToken = TokenLoader.loadKey("hf.api.key.sentiment");
+            this.sentimentClient = new HuggingFaceClient(sentimentToken);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -61,8 +68,22 @@ public class RssScraper implements NewsScraper {
         String ss = "rss-scraper";
         Instant ts = Instant.now();
 
+        String title = extractText(item, "title");
         String rawDescription = extractText(item, "description");
         String cleanSummary = cleanSummary(rawDescription);
+
+        String textToAnalyze = (title + ". " + cleanSummary).trim();
+
+        if (!textToAnalyze.equals(".")) {
+            System.out.println("Analizando noticia: " + title);
+
+            String sentimentJson = sentimentClient.analyze(textToAnalyze, "cardiffnlp/twitter-xlm-roberta-base-sentiment");
+            double finalSentimentScore = SentimentParser.parse(sentimentJson);
+            System.out.println("  -> JSON Sentimiento: " + sentimentJson);
+            System.out.println("  -> Puntuación sentimiento: " + finalSentimentScore);
+
+            System.out.println("---------------------------------------------------");
+        }
 
         return new NewsArticle(
                 extractText(item, "title"),

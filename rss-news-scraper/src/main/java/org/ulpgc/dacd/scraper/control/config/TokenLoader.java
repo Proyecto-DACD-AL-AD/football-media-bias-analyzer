@@ -1,0 +1,23 @@
+package org.ulpgc.dacd.scraper.control.config;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+public class TokenLoader {
+    private static final String FILE_PATH = "tokens.properties";
+
+    public static String loadKey(String keyName) {
+        Properties properties = new Properties();
+        try (FileInputStream input = new FileInputStream(FILE_PATH)) {
+            properties.load(input);
+            String key = properties.getProperty(keyName);
+            if (key == null || key.isEmpty()) {
+                throw new RuntimeException("La clave '" + keyName + "' no existe en tokens.properties");
+            }
+            return key;
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo leer el archivo de tokens: " + e.getMessage());
+        }
+    }
+}
