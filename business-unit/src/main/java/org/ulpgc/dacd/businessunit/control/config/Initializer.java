@@ -5,6 +5,7 @@ import org.ulpgc.dacd.businessunit.control.Controller;
 import org.ulpgc.dacd.businessunit.control.api.DashboardApi;
 import org.ulpgc.dacd.businessunit.control.persistence.EventReader;
 import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
+import org.ulpgc.dacd.businessunit.control.persistence.repositories.DashboardRepository;
 import org.ulpgc.dacd.businessunit.control.persistence.repositories.EventRepository;
 import org.ulpgc.dacd.businessunit.control.subscriber.Subscriber;
 import jakarta.jms.Connection;
@@ -42,7 +43,7 @@ public class Initializer {
         new EventReader(EVENT_STORE_PATH, "football-matches").readStore(controller::processMatch);
     }
 
-    public static DashboardApi buildApi(DatabaseManager dbManager) {
-        return new DashboardApi(dbManager);
+    public static DashboardApi buildApi(DashboardRepository dashboardRepository) {
+        return new DashboardApi(dashboardRepository);
     }
 }
