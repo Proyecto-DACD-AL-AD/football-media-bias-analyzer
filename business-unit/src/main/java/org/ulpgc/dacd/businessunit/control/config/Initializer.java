@@ -2,6 +2,7 @@ package org.ulpgc.dacd.businessunit.control.config;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.ulpgc.dacd.businessunit.control.Controller;
+import org.ulpgc.dacd.businessunit.control.api.DashboardApi;
 import org.ulpgc.dacd.businessunit.control.persistence.EventReader;
 import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
 import org.ulpgc.dacd.businessunit.control.persistence.repositories.EventRepository;
@@ -39,5 +40,9 @@ public class Initializer {
     public static void loadHistoricalData(Controller controller) {
         new EventReader(EVENT_STORE_PATH, "news").readStore(controller::processNews);
         new EventReader(EVENT_STORE_PATH, "football-matches").readStore(controller::processMatch);
+    }
+
+    public static DashboardApi buildApi(DatabaseManager dbManager) {
+        return new DashboardApi(dbManager);
     }
 }

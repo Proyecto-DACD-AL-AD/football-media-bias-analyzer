@@ -1,6 +1,7 @@
 package org.ulpgc.dacd.businessunit;
 
 import org.ulpgc.dacd.businessunit.control.Controller;
+import org.ulpgc.dacd.businessunit.control.api.DashboardApi;
 import org.ulpgc.dacd.businessunit.control.config.Initializer;
 import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
 import org.ulpgc.dacd.businessunit.control.persistence.repositories.EventRepository;
@@ -23,6 +24,9 @@ public class Main {
             Controller controller = Initializer.buildController(connection, newsRepository, matchesRepository);
 
             Initializer.loadHistoricalData(controller);
+
+            DashboardApi api = Initializer.buildApi(dbManager);
+            api.start();
 
             controller.start();
 
