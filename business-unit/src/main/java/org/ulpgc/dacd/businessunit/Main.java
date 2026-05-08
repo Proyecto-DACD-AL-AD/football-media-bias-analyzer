@@ -1,36 +1,39 @@
 package org.ulpgc.dacd.businessunit;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.ulpgc.dacd.businessunit.control.Controller;
-import org.ulpgc.dacd.businessunit.control.subscriber.Subscriber;
+import org.ulpgc.dacd.businessunit.control.api.DashboardApi;
+import org.ulpgc.dacd.businessunit.control.config.Initializer;
+import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
+import org.ulpgc.dacd.businessunit.control.persistence.repositories.DashboardRepository;
+import org.ulpgc.dacd.businessunit.control.persistence.repositories.EventRepository;
+import org.ulpgc.dacd.businessunit.control.persistence.repositories.NewsRepository;
+import org.ulpgc.dacd.businessunit.control.persistence.repositories.MatchesRepository;
 import jakarta.jms.Connection;
-import jakarta.jms.ConnectionFactory;
 
 public class Main {
     public static void main(String[] args) {
         try {
-            ConnectionFactory factory = new ActiveMQConnectionFactory("tcp://localhost:61616");
-            Connection connection = factory.createConnection();
-            connection.setClientID("business-unit-client");
-            connection.start();
+            DatabaseManager dbManager = Initializer.setupDatabase();
 
-            Subscriber newsSubscriber = new Subscriber(
-                    connection,
-                    "news",
-                    "business-news-sub"
-            );
+            EventRepository newsRepository = new NewsRepository(dbManager);
+            newsRepository.initTables();
 
-            Subscriber matchesSubscriber = new Subscriber(
-                    connection,
-                    "football-matches",
-                    "business-matches-sub"
-            );
+            EventRepository matchesRepository = new MatchesRepository(dbManager);
+            matchesRepository.initTables();
 
-            Controller controller = new Controller(newsSubscriber, matchesSubscriber);
+            Connection connection = Initializer.setupActiveMQConnection();
+            Controller controller = Initializer.buildController(connection, newsRepository, matchesRepository);
+
+            Initializer.loadHistoricalData(controller);
+
+            DashboardRepository dashboardRepository = new DashboardRepository(dbManager);
+            DashboardApi api = Initializer.buildApi(dashboardRepository);
+            api.start();
+
             controller.start();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
     }
 }

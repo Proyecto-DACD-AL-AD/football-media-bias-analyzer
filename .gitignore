@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -47,3 +48,7 @@ build/
 
 # Ignorar la carpeta de estados de los feeders
 state/
+
+# Ignorar bases de datos SQLite
+*.db
+datamart/datamart.db
