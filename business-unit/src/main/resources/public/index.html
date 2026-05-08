@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Media Bias Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            height: 60px;
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: #58a6ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .dashboard-container {
+            flex: 1;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 50% 50%;
+            gap: 15px;
+        }
+
+        .chart-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            position: relative;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-core {
+            grid-column: span 2;
+        }
+
+        .chart-title {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 0.9rem;
+            color: #8b949e;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        .chart-container {
+            flex: 1;
+            width: 100%;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>⚽ Media Bias Analyzer</h1>
+    <select id="teamSelector">
+        <option value="Girona FC">Girona FC</option>
+        <option value="Real Madrid">Real Madrid</option>
+        <option value="FC Barcelona">FC Barcelona</option>
+        <option value="Atlético de Madrid">Atlético de Madrid</option>
+    </select>
+</header>
+
+<div class="dashboard-container">
+    <div class="chart-card chart-core">
+        <div class="chart-title">TERMÓMETRO DE PRESIÓN (Sentimiento vs Posición)</div>
+        <div id="thermometerChart" class="chart-container"></div>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-title">EL RADAR DEL SESGO (Sentimiento por Periódico)</div>
+        <div id="radarChart" class="chart-container"></div>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-title">MATRIZ DE TOLERANCIA</div>
+        <div id="scatterChart" class="chart-container"></div>
+    </div>
+</div>
+
+<script>
+    const thermometerChart = echarts.init(document.getElementById('thermometerChart'), 'dark');
+    const radarChart = echarts.init(document.getElementById('radarChart'), 'dark');
+    const scatterChart = echarts.init(document.getElementById('scatterChart'), 'dark');
+
+    window.addEventListener('resize', () => {
+        thermometerChart.resize();
+        radarChart.resize();
+        scatterChart.resize();
+    });
+
+    async function initDashboard() {
+        try {
+            const response = await fetch('http://localhost:8080/api/teams');
+            const teams = await response.json();
+            const selector = document.getElementById('teamSelector');
+
+            teams.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team;
+                option.textContent = team;
+                selector.appendChild(option);
+            });
+
+            selector.addEventListener('change', (e) => loadThermometerData(e.target.value));
+            if (teams.length > 0) loadThermometerData(teams[0]);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function loadThermometerData(team) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/thermometer?team=${encodeURIComponent(team)}`);
+            const data = await response.json();
+
+            const dates = data.map(item => item.date);
+            const sentiments = data.map(item => item.sentiment !== undefined ? item.sentiment : null);
+            const ranks = data.map(item => item.rank !== undefined ? item.rank : null);
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' }
+                },
+                legend: {
+                    data: ['Sentimiento Medio', 'Posición en Liga'],
+                    top: 0,
+                    right: 20,
+                    textStyle: { color: '#c9d1d9' }
+                },
+                grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    data: dates,
+                    axisLine: { lineStyle: { color: '#30363d' } },
+                    axisLabel: { color: '#8b949e' }
+                },
+                yAxis: [
+                    {
+                        type: 'value', name: 'Sentimiento', min: -1, max: 1,
+                        axisLine: { show: true, lineStyle: { color: '#30363d' } },
+                        axisLabel: { color: '#8b949e' },
+                        splitLine: { lineStyle: { color: '#30363d', type: 'dashed' } }
+                    },
+                    {
+                        type: 'value', name: 'Posición', min: 1, max: 20, inverse: true,
+                        axisLine: { show: true, lineStyle: { color: '#30363d' } },
+                        axisLabel: { color: '#8b949e' },
+                        splitLine: { show: false }
+                    }
+                ],
+                series: [
+                    {
+                        name: 'Sentimiento Medio', type: 'line', smooth: true, connectNulls: true,
+                        data: sentiments, itemStyle: { color: '#58a6ff' },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(88, 166, 255, 0.3)' },
+                                { offset: 1, color: 'rgba(88, 166, 255, 0)' }
+                            ])
+                        }
+                    },
+                    {
+                        name: 'Posición en Liga', type: 'line', yAxisIndex: 1, connectNulls: true,
+                        data: ranks, itemStyle: { color: '#3fb950' },
+                        symbol: 'none',
+                        lineStyle: { type: 'dotted', width: 2 }
+                    }
+                ]
+            };
+            thermometerChart.setOption(option);
+        } catch (error) {}
+    }
+
+    initDashboard();
+</script>
+</body>
+</html>
