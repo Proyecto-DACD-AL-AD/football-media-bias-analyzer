@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Media Bias - Stats</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            height: 60px;
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            padding: 10px 25px;
+            gap: 35px;
+            box-sizing: border-box;
+        }
+        header h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: #58a6ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        nav {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        nav a {
+            text-decoration: none;
+            font-size: 0.95rem;
+            color: #8b949e;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+        }
+        nav a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+        nav a.active {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        .global-container {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 100%;
+            gap: 20px;
+        }
+        .chart-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-title {
+            color: #8b949e;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .chart-container {
+            flex: 1;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>⚽ Media Bias Analyzer</h1>
+    <nav>
+        <a href="index.html">Individual View</a>
+        <a href="global.html" class="active">Global View</a>
+    </nav>
+</header>
+
+<div class="global-container">
+    <div class="chart-card">
+        <div class="chart-title">Media Coverage by Team</div>
+        <div id="barChart" class="chart-container"></div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title">Weekly News Frequency</div>
+        <div id="heatmapChart" class="chart-container"></div>
+    </div>
+</div>
+
+<script>
+    const barChart = echarts.init(document.getElementById('barChart'), 'dark');
+    const heatmapChart = echarts.init(document.getElementById('heatmapChart'), 'dark');
+
+    window.addEventListener('resize', () => {
+        barChart.resize();
+        heatmapChart.resize();
+    });
+
+    async function loadGlobalData() {
+        try {
+            const response = await fetch('http://localhost:8080/api/global-stats');
+            const rawData = await response.json();
+
+            const teamTotals = {};
+            rawData.forEach(item => {
+                teamTotals[item.team] = (teamTotals[item.team] || 0) + item.count;
+            });
+
+            const teams = Object.keys(teamTotals).sort((a, b) => teamTotals[b] - teamTotals[a]);
+
+            const heatmapPoints = [];
+            rawData.forEach(item => {
+                const teamIdx = teams.indexOf(item.team);
+                let adjustedDay = item.day === 0 ? 6 : item.day - 1;
+                heatmapPoints.push([adjustedDay, teamIdx, item.count]);
+            });
+
+            const barOption = {
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis' },
+                grid: { bottom: '80px', left: '50px', right: '20px', containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    data: teams,
+                    axisLabel: { rotate: 45, interval: 0, fontSize: 10 }
+                },
+                yAxis: { type: 'value', splitLine: { lineStyle: { color: '#30363d' } } },
+                series: [{
+                    name: 'Total News',
+                    type: 'bar',
+                    data: teams.map(t => teamTotals[t]),
+                    itemStyle: { color: '#58a6ff' }
+                }]
+            };
+
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const heatmapOption = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    position: 'top',
+                    formatter: (p) => `${teams[p.data[1]]} (${days[p.data[0]]}): ${p.data[2]} news`
+                },
+                grid: { height: '80%', top: '5%', left: '10px', right: '40px', bottom: '15%', containLabel: true },
+                xAxis: { type: 'category', data: days, splitArea: { show: true } },
+                yAxis: {
+                    type: 'category',
+                    data: teams,
+                    splitArea: { show: true },
+                    inverse: true,
+                    axisLabel: { fontSize: 10, margin: 15 }
+                },
+                visualMap: {
+                    min: 0, max: 20,
+                    calculate: true, orient: 'horizontal', left: 'center', bottom: '0%',
+                    inRange: { color: ['#0d1117', '#1f6feb', '#58a6ff'] },
+                    textStyle: { color: '#c9d1d9' }
+                },
+                series: [{
+                    name: 'Frequency',
+                    type: 'heatmap',
+                    data: heatmapPoints,
+                    label: { show: false }
+                }]
+            };
+
+            barChart.setOption(barOption);
+            heatmapChart.setOption(heatmapOption);
+        } catch (e) { console.error(e); }
+    }
+    loadGlobalData();
+</script>
+</body>
+</html>

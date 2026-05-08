@@ -1,8 +1,8 @@
 package org.ulpgc.dacd.businessunit.control.api;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import io.javalin.Javalin;
+import io.javalin.plugin.bundled.CorsPluginConfig;
 import org.ulpgc.dacd.businessunit.control.config.TeamsProvider;
 import org.ulpgc.dacd.businessunit.control.persistence.repositories.DashboardRepository;
 
@@ -19,7 +19,7 @@ public class DashboardApi {
 
     public void start() {
         Javalin app = Javalin.create(config -> {
-            config.bundledPlugins.enableCors(cors -> cors.addRule(it -> it.anyHost()));
+            config.bundledPlugins.enableCors(cors -> cors.addRule(CorsPluginConfig.CorsRule::anyHost));
             config.staticFiles.add("/public");
         }).start(8080);
 
@@ -36,6 +36,27 @@ public class DashboardApi {
             }
             ctx.contentType("application/json");
             ctx.result(gson.toJson(repository.getThermometerData(team)));
+        });
+
+        app.get("/api/radar", ctx -> {
+            String team = ctx.queryParam("team");
+            if (team == null || team.isEmpty()) {
+                ctx.status(400).result("Falta el parametro 'team'");
+                return;
+            }
+            ctx.contentType("application/json");
+            ctx.result(gson.toJson(repository.getRadarData(team)));
+        });
+
+        app.get("/api/scatter", ctx -> {
+            String team = ctx.queryParam("team");
+            ctx.contentType("application/json");
+            ctx.result(gson.toJson(repository.getScatterData(team)));
+        });
+
+        app.get("/api/global-stats", ctx -> {
+            ctx.contentType("application/json");
+            ctx.result(gson.toJson(repository.getGlobalStats()));
         });
     }
 }

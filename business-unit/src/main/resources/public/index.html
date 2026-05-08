@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,17 +17,16 @@
             display: flex;
             flex-direction: column;
         }
-
         header {
             height: 60px;
             background-color: #161b22;
             border-bottom: 1px solid #30363d;
             display: flex;
             align-items: center;
-            padding: 0 20px;
-            justify-content: space-between;
+            padding: 10px 25px;
+            gap: 35px;
+            box-sizing: border-box;
         }
-
         header h1 {
             font-size: 1.2rem;
             margin: 0;
@@ -35,7 +34,37 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
+        nav {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        nav a {
+            text-decoration: none;
+            font-size: 0.95rem;
+            color: #8b949e;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+        }
+        nav a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+        nav a.active {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-right label {
+            font-size: 0.9rem;
+            color: #8b949e;
+            font-weight: 600;
+        }
         select {
             background-color: #0d1117;
             color: #c9d1d9;
@@ -46,7 +75,6 @@
             outline: none;
             cursor: pointer;
         }
-
         .dashboard-container {
             flex: 1;
             padding: 15px;
@@ -55,7 +83,6 @@
             grid-template-rows: 50% 50%;
             gap: 15px;
         }
-
         .chart-card {
             background-color: #161b22;
             border: 1px solid #30363d;
@@ -65,11 +92,9 @@
             display: flex;
             flex-direction: column;
         }
-
         .chart-core {
             grid-column: span 2;
         }
-
         .chart-title {
             position: absolute;
             top: 15px;
@@ -79,7 +104,6 @@
             font-weight: 600;
             z-index: 10;
         }
-
         .chart-container {
             flex: 1;
             width: 100%;
@@ -91,27 +115,27 @@
 
 <header>
     <h1>⚽ Media Bias Analyzer</h1>
-    <select id="teamSelector">
-        <option value="Girona FC">Girona FC</option>
-        <option value="Real Madrid">Real Madrid</option>
-        <option value="FC Barcelona">FC Barcelona</option>
-        <option value="Atlético de Madrid">Atlético de Madrid</option>
-    </select>
+    <nav>
+        <a href="index.html" class="active">Individual View</a>
+        <a href="global.html">Global View</a>
+    </nav>
+    <div class="header-right">
+        <label for="teamSelector">Select Team:</label>
+        <select id="teamSelector"></select>
+    </div>
 </header>
 
 <div class="dashboard-container">
     <div class="chart-card chart-core">
-        <div class="chart-title">TERMÓMETRO DE PRESIÓN (Sentimiento vs Posición)</div>
+        <div class="chart-title">Media Sentiment vs League Rank</div>
         <div id="thermometerChart" class="chart-container"></div>
     </div>
-
     <div class="chart-card">
-        <div class="chart-title">EL RADAR DEL SESGO (Sentimiento por Periódico)</div>
+        <div class="chart-title">Sentiment Bias by Source</div>
         <div id="radarChart" class="chart-container"></div>
     </div>
-
     <div class="chart-card">
-        <div class="chart-title">MATRIZ DE TOLERANCIA</div>
+        <div class="chart-title">Media Tolerance Matrix</div>
         <div id="scatterChart" class="chart-container"></div>
     </div>
 </div>
@@ -140,11 +164,23 @@
                 selector.appendChild(option);
             });
 
-            selector.addEventListener('change', (e) => loadThermometerData(e.target.value));
-            if (teams.length > 0) loadThermometerData(teams[0]);
-        } catch (error) {
-            console.error(error);
-        }
+            const defaultTeam = "Deportivo Alavés";
+            const selectedTeam = teams.includes(defaultTeam) ? defaultTeam : teams[0];
+
+            if (selectedTeam) {
+                selector.value = selectedTeam;
+                loadThermometerData(selectedTeam);
+                loadRadarData(selectedTeam);
+                loadScatterData(selectedTeam);
+            }
+
+            selector.addEventListener('change', (e) => {
+                loadThermometerData(e.target.value);
+                loadRadarData(e.target.value);
+                loadScatterData(e.target.value);
+            });
+
+        } catch (error) { console.error(error); }
     }
 
     async function loadThermometerData(team) {
@@ -152,38 +188,44 @@
             const response = await fetch(`http://localhost:8080/api/thermometer?team=${encodeURIComponent(team)}`);
             const data = await response.json();
 
-            const dates = data.map(item => item.date);
-            const sentiments = data.map(item => item.sentiment !== undefined ? item.sentiment : null);
-            const ranks = data.map(item => item.rank !== undefined ? item.rank : null);
-
             const option = {
                 backgroundColor: 'transparent',
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: { type: 'cross' }
-                },
+                tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
                 legend: {
-                    data: ['Sentimiento Medio', 'Posición en Liga'],
-                    top: 0,
-                    right: 20,
-                    textStyle: { color: '#c9d1d9' }
+                    data: ['Avg. Sentiment Score', 'League Rank'],
+                    top: 0, right: 20, textStyle: { color: '#c9d1d9' }
                 },
-                grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                grid: { left: '5%', right: '10%', bottom: '15%', containLabel: true },
                 xAxis: {
                     type: 'category',
-                    data: dates,
+                    data: data.map(item => item.date),
+                    name: 'Timeline',
+                    nameLocation: 'middle',
+                    nameGap: 35,
                     axisLine: { lineStyle: { color: '#30363d' } },
                     axisLabel: { color: '#8b949e' }
                 },
                 yAxis: [
                     {
-                        type: 'value', name: 'Sentimiento', min: -1, max: 1,
+                        type: 'value',
+                        name: 'Sentiment Score',
+                        nameLocation: 'middle',
+                        nameGap: 45,
+                        min: -1,
+                        max: 1,
                         axisLine: { show: true, lineStyle: { color: '#30363d' } },
                         axisLabel: { color: '#8b949e' },
                         splitLine: { lineStyle: { color: '#30363d', type: 'dashed' } }
                     },
                     {
-                        type: 'value', name: 'Posición', min: 1, max: 20, inverse: true,
+                        type: 'value',
+                        name: 'League Rank',
+                        nameLocation: 'middle',
+                        nameGap: 40,
+                        nameRotate: 270,
+                        min: 1,
+                        max: 20,
+                        inverse: true,
                         axisLine: { show: true, lineStyle: { color: '#30363d' } },
                         axisLabel: { color: '#8b949e' },
                         splitLine: { show: false }
@@ -191,8 +233,12 @@
                 ],
                 series: [
                     {
-                        name: 'Sentimiento Medio', type: 'line', smooth: true, connectNulls: true,
-                        data: sentiments, itemStyle: { color: '#58a6ff' },
+                        name: 'Avg. Sentiment Score',
+                        type: 'line',
+                        smooth: true,
+                        connectNulls: true,
+                        data: data.map(item => item.sentiment),
+                        itemStyle: { color: '#58a6ff' },
                         areaStyle: {
                             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                                 { offset: 0, color: 'rgba(88, 166, 255, 0.3)' },
@@ -201,8 +247,12 @@
                         }
                     },
                     {
-                        name: 'Posición en Liga', type: 'line', yAxisIndex: 1, connectNulls: true,
-                        data: ranks, itemStyle: { color: '#3fb950' },
+                        name: 'League Rank',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        connectNulls: true,
+                        data: data.map(item => item.rank),
+                        itemStyle: { color: '#3fb950' },
                         symbol: 'none',
                         lineStyle: { type: 'dotted', width: 2 }
                     }
@@ -210,6 +260,98 @@
             };
             thermometerChart.setOption(option);
         } catch (error) {}
+    }
+
+    async function loadRadarData(team) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/radar?team=${encodeURIComponent(team)}`);
+            const data = await response.json();
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'item' },
+                radar: {
+                    indicator: data.map(item => ({ name: item.source, max: 1, min: -1 })),
+                    shape: 'polygon',
+                    splitNumber: 4,
+                    axisName: { color: '#c9d1d9', borderRadius: 3, padding: [3, 5] },
+                    splitArea: { areaStyle: { color: ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)'] } },
+                    splitLine: { lineStyle: { color: '#30363d' } },
+                    axisLine: { lineStyle: { color: '#30363d' } }
+                },
+                series: [{
+                    name: 'Sentiment Bias',
+                    type: 'radar',
+                    data: [{
+                        value: data.map(item => item.sentiment),
+                        name: `Sentiment for ${team}`,
+                        itemStyle: { color: '#d2a8ff' },
+                        areaStyle: { color: 'rgba(210, 168, 255, 0.4)' },
+                        lineStyle: { width: 2 }
+                    }]
+                }]
+            };
+            radarChart.setOption(option);
+        } catch (error) { console.error(error); }
+    }
+
+    async function loadScatterData(team) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/scatter?team=${encodeURIComponent(team)}`);
+            const data = await response.json();
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    formatter: (params) => {
+                        const rank = Math.round(params.value[0]);
+                        const sentiment = params.value[1].toFixed(2);
+                        const date = params.value[2] ? params.value[2] : 'N/A';
+
+                        return `
+                            <div style="border-bottom: 1px solid rgba(255,255,255,.3); padding-bottom: 5px; margin-bottom: 5px;">
+                                <b>Date:</b> ${date}
+                            </div>
+                            <b>League Rank:</b> ${rank}<br/>
+                            <b>Sentiment Score:</b> ${sentiment}
+                        `;
+                    }
+                },
+                grid: { left: '10%', right: '10%', bottom: '15%', containLabel: true },
+                xAxis: {
+                    name: 'League Rank',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    min: 1,
+                    max: 20,
+                    inverse: true,
+                    interval: 1,
+                    axisLabel: { color: '#8b949e' }
+                },
+                yAxis: {
+                    name: 'Sentiment Score',
+                    nameLocation: 'middle',
+                    nameGap: 40,
+                    min: -1,
+                    max: 1,
+                    axisLabel: { color: '#8b949e' }
+                },
+                series: [{
+                    symbolSize: 15,
+                    data: data,
+                    type: 'scatter',
+                    itemStyle: { color: '#ff7b72', borderColor: '#fff', borderWidth: 1 },
+                    markLine: {
+                        silent: true,
+                        lineStyle: { type: 'dashed', color: '#8b949e' },
+                        label: { show: false },
+                        data: [ {xAxis: 10.5}, {yAxis: 0} ]
+                    }
+                }]
+            };
+            scatterChart.setOption(option);
+        } catch (error) { console.error(error); }
     }
 
     initDashboard();
