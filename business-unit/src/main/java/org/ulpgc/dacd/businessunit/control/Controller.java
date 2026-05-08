@@ -8,11 +8,13 @@ public class Controller {
     private final Subscriber newsSubscriber;
     private final Subscriber matchesSubscriber;
     private final EventRepository newsRepository;
+    private final EventRepository matchesRepository;
 
-    public Controller(Subscriber newsSubscriber, Subscriber matchesSubscriber, EventRepository newsRepository) {
+    public Controller(Subscriber newsSubscriber, Subscriber matchesSubscriber, EventRepository newsRepository, EventRepository matchesRepository) {
         this.newsSubscriber = newsSubscriber;
         this.matchesSubscriber = matchesSubscriber;
         this.newsRepository = newsRepository;
+        this.matchesRepository = matchesRepository;
     }
 
     public void start() {
@@ -25,6 +27,6 @@ public class Controller {
     }
 
     public void processMatch(String topic, JsonObject json) {
-
+        matchesRepository.save(json);
     }
 }

@@ -30,10 +30,10 @@ public class Initializer {
         return connection;
     }
 
-    public static Controller buildController(Connection connection, EventRepository newsRepository) {
+    public static Controller buildController(Connection connection, EventRepository newsRepository, EventRepository matchesRepository) {
         Subscriber newsSub = new Subscriber(connection, "news", "business-news-sub");
         Subscriber matchesSub = new Subscriber(connection, "football-matches", "business-matches-sub");
-        return new Controller(newsSub, matchesSub, newsRepository);
+        return new Controller(newsSub, matchesSub, newsRepository, matchesRepository);
     }
 
     public static void loadHistoricalData(Controller controller) {
