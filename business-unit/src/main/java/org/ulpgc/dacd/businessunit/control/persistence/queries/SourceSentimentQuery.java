@@ -8,23 +8,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class RadarQuery {
+public class SourceSentimentQuery {
     private final DatabaseManager dbManager;
-    private static final String SQL = """
+    private static final String SQL_QUERY = """
             SELECT source, SUM(avg_sentiment * news_count) / SUM(news_count) as global_sentiment
             FROM daily_sentiment
             WHERE team = ?
             GROUP BY source
             """;
 
-    public RadarQuery(DatabaseManager dbManager) {
+    public SourceSentimentQuery(DatabaseManager dbManager) {
         this.dbManager = dbManager;
     }
 
     public JsonArray execute(String team) {
         JsonArray results = new JsonArray();
         try (Connection conn = dbManager.connect();
-             PreparedStatement preparedStatement = conn.prepareStatement(SQL)) {
+             PreparedStatement preparedStatement = conn.prepareStatement(SQL_QUERY)) {
 
             preparedStatement.setString(1, team);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

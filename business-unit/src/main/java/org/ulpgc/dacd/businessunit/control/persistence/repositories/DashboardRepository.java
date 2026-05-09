@@ -3,33 +3,33 @@ package org.ulpgc.dacd.businessunit.control.persistence.repositories;
 import com.google.gson.JsonArray;
 import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
 import org.ulpgc.dacd.businessunit.control.persistence.queries.GlobalStatsQuery;
-import org.ulpgc.dacd.businessunit.control.persistence.queries.RadarQuery;
-import org.ulpgc.dacd.businessunit.control.persistence.queries.ScatterQuery;
-import org.ulpgc.dacd.businessunit.control.persistence.queries.ThermometerQuery;
+import org.ulpgc.dacd.businessunit.control.persistence.queries.SourceSentimentQuery;
+import org.ulpgc.dacd.businessunit.control.persistence.queries.RankSentimentCorrelationQuery;
+import org.ulpgc.dacd.businessunit.control.persistence.queries.TeamEvolutionQuery;
 
 public class DashboardRepository {
-    private final ThermometerQuery thermometerQuery;
-    private final RadarQuery radarQuery;
-    private final ScatterQuery scatterQuery;
+    private final TeamEvolutionQuery teamEvolutionQuery;
+    private final SourceSentimentQuery sourceSentimentQuery;
+    private final RankSentimentCorrelationQuery rankSentimentCorrelationQuery;
     private final GlobalStatsQuery globalStatsQuery;
 
     public DashboardRepository(DatabaseManager dbManager) {
-        this.thermometerQuery = new ThermometerQuery(dbManager);
-        this.radarQuery = new RadarQuery(dbManager);
-        this.scatterQuery = new ScatterQuery(dbManager);
+        this.teamEvolutionQuery = new TeamEvolutionQuery(dbManager);
+        this.sourceSentimentQuery = new SourceSentimentQuery(dbManager);
+        this.rankSentimentCorrelationQuery = new RankSentimentCorrelationQuery(dbManager);
         this.globalStatsQuery = new GlobalStatsQuery(dbManager);
     }
 
     public JsonArray getThermometerData(String team) {
-        return thermometerQuery.execute(team);
+        return teamEvolutionQuery.execute(team);
     }
 
     public JsonArray getRadarData(String team) {
-        return radarQuery.execute(team);
+        return sourceSentimentQuery.execute(team);
     }
 
     public JsonArray getScatterData(String team) {
-        return scatterQuery.execute(team);
+        return rankSentimentCorrelationQuery.execute(team);
     }
 
     public JsonArray getGlobalStats() {

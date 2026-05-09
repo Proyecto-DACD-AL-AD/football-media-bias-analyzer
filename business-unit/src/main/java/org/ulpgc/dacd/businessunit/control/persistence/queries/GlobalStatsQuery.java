@@ -8,7 +8,7 @@ import java.sql.*;
 
 public class GlobalStatsQuery {
     private final DatabaseManager dbManager;
-    private static final String SQL = """
+    private static final String SQL_QUERY = """
             SELECT team, strftime('%w', date) as day_of_week, SUM(news_count) as daily_total
             FROM daily_sentiment
             GROUP BY team, day_of_week
@@ -22,14 +22,14 @@ public class GlobalStatsQuery {
         JsonArray results = new JsonArray();
         try (Connection conn = dbManager.connect();
              Statement statement = conn.createStatement();
-             ResultSet resultSet = statement.executeQuery(SQL)) {
+             ResultSet resultSet = statement.executeQuery(SQL_QUERY)) {
 
             while (resultSet.next()) {
-                JsonObject obj = new JsonObject();
-                obj.addProperty("team", resultSet.getString("team"));
-                obj.addProperty("day", resultSet.getInt("day_of_week"));
-                obj.addProperty("count", resultSet.getInt("daily_total"));
-                results.add(obj);
+                JsonObject object = new JsonObject();
+                object.addProperty("team", resultSet.getString("team"));
+                object.addProperty("day", resultSet.getInt("day_of_week"));
+                object.addProperty("count", resultSet.getInt("daily_total"));
+                results.add(object);
             }
         } catch (SQLException e) {
             System.err.println("Error in GlobalStatsQuery: " + e.getMessage());

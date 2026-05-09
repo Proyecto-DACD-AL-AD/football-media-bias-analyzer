@@ -7,9 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ScatterQuery {
+public class RankSentimentCorrelationQuery {
     private final DatabaseManager dbManager;
-    private static final String SQL = """
+    private static final String SQL_QUERY = """
             SELECT
                 CASE WHEN m.home_team = ? THEN m.home_rank ELSE m.away_rank END as rank,
                 SUM(s.avg_sentiment * s.news_count) / SUM(s.news_count) as day_sentiment,
@@ -20,14 +20,14 @@ public class ScatterQuery {
             GROUP BY m.date
             """;
 
-    public ScatterQuery(DatabaseManager dbManager) {
+    public RankSentimentCorrelationQuery(DatabaseManager dbManager) {
         this.dbManager = dbManager;
     }
 
     public JsonArray execute(String team) {
         JsonArray results = new JsonArray();
         try (Connection conn = dbManager.connect();
-             PreparedStatement preparedStatement = conn.prepareStatement(SQL)) {
+             PreparedStatement preparedStatement = conn.prepareStatement(SQL_QUERY)) {
 
             preparedStatement.setString(1, team);
             preparedStatement.setString(2, team);

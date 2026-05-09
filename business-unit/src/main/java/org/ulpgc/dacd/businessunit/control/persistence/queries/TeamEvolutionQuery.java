@@ -8,11 +8,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
-public class ThermometerQuery {
+public class TeamEvolutionQuery {
     private static final int PARAMETER_COUNT = 6;
     private final DatabaseManager dbManager;
-    private static final String SQL = """
+    private static final String SQL_QUERY = """
             WITH RECURSIVE
             MinMaxDates AS (
                 SELECT MIN(substr(date, 1, 10)) as min_date, MAX(substr(date, 1, 10)) as max_date
@@ -34,39 +35,34 @@ public class ThermometerQuery {
             FROM DateRange dr
             """;
 
-    public ThermometerQuery(DatabaseManager dbManager) {
+    public TeamEvolutionQuery(DatabaseManager dbManager) {
         this.dbManager = dbManager;
     }
 
     public JsonArray execute(String teamName) {
         JsonArray results = new JsonArray();
         try (Connection connection = dbManager.connect();
-             PreparedStatement preparedStatement = connection.prepareStatement(SQL)) {
-
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_QUERY)) {
             for (int parameterIndex = 1; parameterIndex <= PARAMETER_COUNT; parameterIndex++) {
                 preparedStatement.setString(parameterIndex, teamName);
             }
-
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     JsonObject dataPoint = new JsonObject();
                     dataPoint.addProperty("date", resultSet.getString("date"));
-
-                    double sentimentScore = resultSet.getDouble("daily_sentiment");
-                    if (!resultSet.wasNull()) {
+                    Double sentimentScore = resultSet.getObject("daily_sentiment", Double.class);
+                    if (Objects.nonNull(sentimentScore)) {
                         dataPoint.addProperty("sentiment", sentimentScore);
                     }
-
-                    int teamRank = resultSet.getInt("rank");
-                    if (!resultSet.wasNull()) {
+                    Integer teamRank = resultSet.getObject("rank", Integer.class);
+                    if (Objects.nonNull(teamRank)) {
                         dataPoint.addProperty("rank", teamRank);
                     }
-
                     results.add(dataPoint);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error in ThermometerQuery: " + e.getMessage());
+            System.err.println("Error in TeamEvolutionQuery: " + e.getMessage());
         }
         return results;
     }

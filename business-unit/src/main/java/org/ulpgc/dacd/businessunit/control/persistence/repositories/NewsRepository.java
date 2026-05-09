@@ -13,7 +13,7 @@ public class NewsRepository implements SqlRepository {
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             .withZone(ZoneId.of("UTC"));
 
-    private static final String TABLE_PROCESSED_NEWS = """
+    private static final String CREATE_TABLE_PROCESSED_NEWS = """
             CREATE TABLE IF NOT EXISTS processed_news (
                 url TEXT,
                 team TEXT,
@@ -22,7 +22,7 @@ public class NewsRepository implements SqlRepository {
             );
             """;
 
-    private static final String TABLE_DAILY_SENTIMENT = """
+    private static final String CREATE_TABLE_DAILY_SENTIMENT = """
             CREATE TABLE IF NOT EXISTS daily_sentiment (
                 date TEXT,
                 team TEXT,
@@ -46,8 +46,8 @@ public class NewsRepository implements SqlRepository {
     public void initTables() {
         try (Connection conn = dbManager.connect();
              Statement statement = conn.createStatement()) {
-            statement.execute(TABLE_PROCESSED_NEWS);
-            statement.execute(TABLE_DAILY_SENTIMENT);
+            statement.execute(CREATE_TABLE_PROCESSED_NEWS);
+            statement.execute(CREATE_TABLE_DAILY_SENTIMENT);
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         }
@@ -93,10 +93,10 @@ public class NewsRepository implements SqlRepository {
             preparedStatement.setString(1, dateStr);
             preparedStatement.setString(2, team);
             preparedStatement.setString(3, source);
-            try (ResultSet rs = preparedStatement.executeQuery()) {
-                if (rs.next()) {
-                    int oldCount = rs.getInt("news_count");
-                    double oldAvg = rs.getDouble("avg_sentiment");
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int oldCount = resultSet.getInt("news_count");
+                    double oldAvg = resultSet.getDouble("avg_sentiment");
                     int newCount = oldCount + 1;
                     double newAvg = ((oldAvg * oldCount) + sentimentScore) / newCount;
                     updateEntry(conn, dateStr, team, source, newCount, newAvg);
