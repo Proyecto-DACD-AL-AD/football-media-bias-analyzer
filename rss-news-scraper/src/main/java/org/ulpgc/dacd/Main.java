@@ -23,12 +23,13 @@ public class Main {
 
         NewsStore store = new NewsPublisher("tcp://localhost:61616", "news");
         List<String> teams = TeamLoader.load("media_teams.json");
-
         Controller controller = new Controller(feeders, store, teams);
 
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        System.out.println("Iniciando el recolector de noticias RSS...");
-
-        scheduler.scheduleAtFixedRate(controller::start, 0, 12, TimeUnit.HOURS);
+        System.out.println("Starting RSS news collector...");
+        try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1)) {
+            scheduler.scheduleAtFixedRate(controller::start, 0, 12, TimeUnit.HOURS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class TeamLoader {
-
     public static List<String> load(String filePath) {
         try (InputStreamReader reader = new InputStreamReader(
                 Objects.requireNonNull(TeamLoader.class.getClassLoader().getResourceAsStream(filePath)))) {
-            Type listType = new TypeToken<List<String>>() {}.getType();
+            Type listType = new TypeToken<List<String>>() {
+            }.getType();
             return new Gson().fromJson(reader, listType);
         } catch (Exception e) {
             throw new RuntimeException(e);

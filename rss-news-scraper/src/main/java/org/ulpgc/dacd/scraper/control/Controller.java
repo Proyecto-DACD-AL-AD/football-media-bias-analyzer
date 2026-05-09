@@ -27,6 +27,6 @@ public class Controller {
             }
         }
 
-        System.out.println("Ciclo de recoleccion finalizado. Esperando a la proxima ejecucion...\n");
+        System.out.println("Collection cycle completed. Waiting for next run...\n");
     }
 }
