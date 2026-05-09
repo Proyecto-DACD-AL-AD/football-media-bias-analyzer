@@ -4,30 +4,28 @@ import org.ulpgc.dacd.businessunit.control.Controller;
 import org.ulpgc.dacd.businessunit.control.api.DashboardApi;
 import org.ulpgc.dacd.businessunit.control.config.Initializer;
 import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
-import org.ulpgc.dacd.businessunit.control.persistence.repositories.DashboardRepository;
-import org.ulpgc.dacd.businessunit.control.persistence.repositories.EventRepository;
-import org.ulpgc.dacd.businessunit.control.persistence.repositories.NewsRepository;
-import org.ulpgc.dacd.businessunit.control.persistence.repositories.MatchesRepository;
+import org.ulpgc.dacd.businessunit.control.persistence.repositories.*;
 import jakarta.jms.Connection;
+
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        Initializer initializer = new Initializer();
         try {
-            DatabaseManager dbManager = Initializer.setupDatabase();
+            DatabaseManager dbManager = initializer.setupDatabase();
 
-            EventRepository newsRepository = new NewsRepository(dbManager);
-            newsRepository.initTables();
+            SqlRepository newsRepository = new NewsRepository(dbManager);
+            SqlRepository matchesRepository = new MatchesRepository(dbManager);
+            dbManager.initialize(List.of(newsRepository, matchesRepository));
 
-            EventRepository matchesRepository = new MatchesRepository(dbManager);
-            matchesRepository.initTables();
+            Connection connection = initializer.setupActiveMQConnection();
+            Controller controller = initializer.buildController(connection, newsRepository, matchesRepository);
 
-            Connection connection = Initializer.setupActiveMQConnection();
-            Controller controller = Initializer.buildController(connection, newsRepository, matchesRepository);
-
-            Initializer.loadHistoricalData(controller);
+            initializer.loadHistoricalData(controller);
 
             DashboardRepository dashboardRepository = new DashboardRepository(dbManager);
-            DashboardApi api = Initializer.buildApi(dashboardRepository);
+            DashboardApi api = initializer.buildApi(dashboardRepository);
             api.start();
 
             controller.start();

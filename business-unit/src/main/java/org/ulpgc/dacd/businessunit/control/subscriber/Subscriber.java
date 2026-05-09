@@ -3,10 +3,10 @@ package org.ulpgc.dacd.businessunit.control.subscriber;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import jakarta.jms.*;
+
 import java.util.function.BiConsumer;
 
 public class Subscriber {
-
     private final Connection connection;
     private final String topicName;
     private final String subscriptionId;
@@ -22,9 +22,7 @@ public class Subscriber {
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Topic topic = session.createTopic(topicName);
             MessageConsumer consumer = session.createDurableSubscriber(topic, subscriptionId);
-
-            System.out.println("Suscrito a '" + topicName + "' de forma durable. Esperando eventos...");
-
+            System.out.println("Subscribed to'" + topicName + "' on a long-term basis. Waiting for events...");
             consumer.setMessageListener(message -> {
                 try {
                     if (message instanceof TextMessage textMessage) {
@@ -33,12 +31,12 @@ public class Subscriber {
                         eventConsumer.accept(topicName, event);
                     }
                 } catch (JMSException e) {
-                    System.err.println("Error al leer el mensaje: " + e.getMessage());
+                    System.err.println("Error reading the message: " + e.getMessage());
                 }
             });
 
         } catch (JMSException e) {
-            System.err.println("Error configurando el suscriptor para " + topicName + ": " + e.getMessage());
+            System.err.println("Error configuring subscriber for " + topicName + ": " + e.getMessage());
         }
     }
 }

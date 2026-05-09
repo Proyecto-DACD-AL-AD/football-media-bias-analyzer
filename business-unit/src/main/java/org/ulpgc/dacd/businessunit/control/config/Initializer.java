@@ -13,18 +13,19 @@ import jakarta.jms.ConnectionFactory;
 import java.io.File;
 
 public class Initializer {
+    private static final int DEFAULT_PORT = 8080;
     private static final String BROKER_URL = "tcp://localhost:61616";
     private static final String CLIENT_ID = "business-unit-client";
     private static final String DIRECTORY = "datamart";
     private static final String DB_PATH = DIRECTORY + "/datamart.db";
     private static final String EVENT_STORE_PATH = "eventstore";
 
-    public static DatabaseManager setupDatabase() {
+    public DatabaseManager setupDatabase() {
         new File(DIRECTORY).mkdirs();
         return new DatabaseManager(DB_PATH);
     }
 
-    public static Connection setupActiveMQConnection() throws Exception {
+    public Connection setupActiveMQConnection() throws Exception {
         ConnectionFactory factory = new ActiveMQConnectionFactory(BROKER_URL);
         Connection connection = factory.createConnection();
         connection.setClientID(CLIENT_ID);
@@ -32,18 +33,18 @@ public class Initializer {
         return connection;
     }
 
-    public static Controller buildController(Connection connection, EventRepository newsRepository, EventRepository matchesRepository) {
+    public Controller buildController(Connection connection, EventRepository newsRepository, EventRepository matchesRepository) {
         Subscriber newsSub = new Subscriber(connection, "news", "business-news-sub");
         Subscriber matchesSub = new Subscriber(connection, "football-matches", "business-matches-sub");
         return new Controller(newsSub, matchesSub, newsRepository, matchesRepository);
     }
 
-    public static void loadHistoricalData(Controller controller) {
+    public void loadHistoricalData(Controller controller) {
         new EventReader(EVENT_STORE_PATH, "news").readStore(controller::processNews);
         new EventReader(EVENT_STORE_PATH, "football-matches").readStore(controller::processMatch);
     }
 
-    public static DashboardApi buildApi(DashboardRepository dashboardRepository) {
-        return new DashboardApi(dashboardRepository);
+    public DashboardApi buildApi(DashboardRepository dashboardRepository) {
+        return new DashboardApi(dashboardRepository, DEFAULT_PORT);
     }
 }
