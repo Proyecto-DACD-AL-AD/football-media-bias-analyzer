@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RssScraper implements NewsScraper {
     private final String baseUrl;
@@ -38,35 +39,31 @@ public class RssScraper implements NewsScraper {
     @Override
     public final List<NewsArticle> feed(String teamName) {
         List<NewsArticle> articles = new ArrayList<>();
-        String teamSlug = teamUrlNames.get(teamName);
+        String teamIdentifier = teamUrlNames.get(teamName);
 
-        if (teamSlug == null) {
+        if (teamIdentifier == null) {
             handleMissingTeam(teamName);
             return articles;
         }
-
         try {
-            Document doc = Jsoup.connect(String.format(baseUrl, teamSlug)).get();
-            Elements items = doc.select("item");
-            for (Element item : items) {
-                articles.add(parseArticle(item, teamName));
-            }
+            Document scrapedContent = Jsoup.connect(String.format(baseUrl, teamIdentifier)).get();
+            Elements newsElements = scrapedContent.select("item");
+            articles = newsElements.stream()
+                    .map(newsElement -> parseArticle(newsElement, teamName))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             System.err.println("Error en " + sourceName + " para " + teamName + ": " + e.getMessage());
         }
         return articles;
     }
 
-    protected NewsArticle parseArticle(Element item, String teamName) {
-        String title = extractText(item, "title");
-        String rawDescription = extractText(item, "description");
-        String cleanSummary = cleanSummary(rawDescription);
-
+    protected NewsArticle parseArticle(Element newsElement, String teamName) {
+        String rawDescription = extractText(newsElement, "description");
         return new NewsArticle(
-                title,
-                cleanSummary,
-                extractText(item, "link"),
-                parseDate(extractText(item, "pubDate")),
+                extractText(newsElement, "title"),
+                cleanSummary(rawDescription),
+                extractText(newsElement, "link"),
+                parseDate(extractText(newsElement, "pubDate")),
                 sourceName,
                 teamName,
                 0.0,
@@ -83,8 +80,8 @@ public class RssScraper implements NewsScraper {
         return ZonedDateTime.parse(dateStr, DateTimeFormatter.RFC_1123_DATE_TIME).toInstant();
     }
 
-    private String extractText(Element item, String tag) {
-        Element element = item.selectFirst(tag);
+    private String extractText(Element newsElement, String tag) {
+        Element element = newsElement.selectFirst(tag);
         return element != null ? element.text() : "";
     }
 

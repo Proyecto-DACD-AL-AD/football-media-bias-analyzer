@@ -4,12 +4,12 @@ import com.google.gson.Gson;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import jakarta.jms.*;
 import org.ulpgc.dacd.api.model.Match;
+
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 
 public class FootballMatchPublisher implements FootballMatchStore {
-
     private final String brokerUrl;
     private final String topicName;
     private final Gson serializer;
@@ -27,16 +27,14 @@ public class FootballMatchPublisher implements FootballMatchStore {
     @Override
     public void store(List<Match> matches) {
         matches.sort(Comparator.comparing(Match::date));
-
-        try (Connection connection = createConnection()){
+        try (Connection connection = createConnection()) {
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = session.createTopic(topicName);
             MessageProducer producer = session.createProducer(destination);
-
             boolean dateUpdated = false;
             int eventsPublishedCounter = 0;
 
-            for (Match match: matches) {
+            for (Match match : matches) {
                 Instant matchDate = match.date();
                 if (matchDate.isAfter(lastPublishedDate)) {
                     String jsonEvent = serializer.toJson(match);
@@ -50,11 +48,10 @@ public class FootballMatchPublisher implements FootballMatchStore {
             }
 
             if (dateUpdated) watermarkManager.saveLastDate(lastPublishedDate);
-
-            System.out.println("Se han enviado " + eventsPublishedCounter + " mensajes NUEVOS al topic: '" + topicName + "'...");
+            System.out.println(eventsPublishedCounter + " new messages have been sent to the topic '" + topicName + "'...");
 
         } catch (JMSException e) {
-            System.err.println("Error al enviar el mensaje a ActiveMQ: " + e.getMessage());
+            System.err.println("Error sending message to ActiveMQ: " + e.getMessage());
         }
     }
 

@@ -13,11 +13,11 @@ public class TokenLoader {
             properties.load(input);
             String key = properties.getProperty(keyName);
             if (key == null || key.isEmpty()) {
-                throw new RuntimeException("La clave '" + keyName + "' no existe en tokens.properties");
+                throw new RuntimeException("The key '" + keyName + "' does not exists on 'tokens.properties'");
             }
             return key;
         } catch (IOException e) {
-            throw new RuntimeException("No se pudo leer el archivo de tokens: " + e.getMessage());
+            throw new RuntimeException("Tokens file could not be read: " + e.getMessage());
         }
     }
 }

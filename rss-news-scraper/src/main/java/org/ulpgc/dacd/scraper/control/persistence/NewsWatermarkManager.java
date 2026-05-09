@@ -24,16 +24,18 @@ public class NewsWatermarkManager {
         try {
             if (Files.exists(watermarkFile)) {
                 String json = Files.readString(watermarkFile);
-                java.lang.reflect.Type stringMapType = new com.google.gson.reflect.TypeToken<Map<String, String>>(){}.getType();
+                java.lang.reflect.Type stringMapType = new com.google.gson.reflect.TypeToken<Map<String, String>>() {
+                }.getType();
                 Map<String, String> rawMap = serializer.fromJson(json, stringMapType);
-                if (rawMap != null) {
-                    for (Map.Entry<String, String> entry : rawMap.entrySet()) {
-                        newsPaperDatesMap.put(entry.getKey(), Instant.parse(entry.getValue()));
-                    }
-                }
+                if (rawMap == null) return new HashMap<>();
+                return rawMap.entrySet().stream()
+                        .collect(java.util.stream.Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> Instant.parse(entry.getValue())
+                        ));
             }
         } catch (Exception e) {
-            System.err.println("Error leyendo el watermark: " + e.getMessage());
+            System.err.println("Error reading the watermark: " + e.getMessage());
         }
         return newsPaperDatesMap;
     }
@@ -47,7 +49,7 @@ public class NewsWatermarkManager {
             String json = serializer.toJson(lastDatesToSave);
             Files.writeString(watermarkFile, json);
         } catch (Exception e) {
-            System.err.println("Error escribiendo el chivato de noticias: " + e.getMessage());
+            System.err.println("Error writing published news last dates: " + e.getMessage());
         }
     }
 }

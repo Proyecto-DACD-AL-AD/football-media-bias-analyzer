@@ -5,6 +5,5 @@ import org.ulpgc.dacd.api.model.Match;
 import java.util.List;
 
 public interface FootballMatchStore {
-
-     void store(List<Match> matches);
+    void store(List<Match> matches);
 }

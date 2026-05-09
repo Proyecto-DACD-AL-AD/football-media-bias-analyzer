@@ -1,24 +1,22 @@
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ulpgc.dacd.api.control.filter.FootballMatchFilter;
+import org.ulpgc.dacd.api.control.parser.FootballMatchParser;
 import org.ulpgc.dacd.api.model.Match;
 
 import java.util.List;
 import java.util.Map;
 
-public class FootballMatchFilterTest {
-
-    private FootballMatchFilter matchFilter;
+public class FootballMatchParserTest {
+    private FootballMatchParser matchFilter;
 
     @Before
     public void setUp(){
-         matchFilter = new FootballMatchFilter();
+         matchFilter = new FootballMatchParser();
     }
 
     @Test
     public void validJsonShouldReturnCorrectMap() {
-
         String mockJson = "{" +
                 "\"standings\": [{" +
                 "\"type\": \"TOTAL\"," +
@@ -46,7 +44,6 @@ public class FootballMatchFilterTest {
 
     @Test
     public void validMatchesJsonShouldReturnCorrectMatchInfo() {
-
         String mockMatchesJson = "{" +
                 "\"matches\": [" +
                 "  {" +
@@ -72,10 +69,8 @@ public class FootballMatchFilterTest {
                 "]" +
                 "}";
 
-        List<Match> result = matchFilter.filterMatches(mockMatchesJson);
-
+        List<Match> result = matchFilter.parseMatches(mockMatchesJson);
         Assert.assertNotNull("La lista de partidos no debe ser nula", result);
-
         Assert.assertEquals("Debería haber filtrado el partido no finalizado", 1, result.size());
         Assert.assertEquals("El equipo local del primer partido es incorrecto", "Real Madrid CF", result.getFirst().homeTeam());
         Assert.assertEquals("La jornada del primer partido es incorrecta", 1, result.getFirst().matchday());
@@ -84,8 +79,6 @@ public class FootballMatchFilterTest {
 
     @Test
     public void scheduledMatchShouldNotAppearInFilteredMatches() {
-        // AÑADIDO: utcDate. Aunque se filtre por status antes, es buena práctica
-        // tener un JSON de mock lo más real posible.
         String mockMatchesJson = "{" +
                 "\"matches\": [" +
                 "  {" +
@@ -101,15 +94,14 @@ public class FootballMatchFilterTest {
                 "]" +
                 "}";
 
-        List<Match> result = matchFilter.filterMatches(mockMatchesJson);
+        List<Match> result = matchFilter.parseMatches(mockMatchesJson);
         Assert.assertEquals("Debería haber 0 partidos en la lista", 0, result.size());
     }
 
     @Test
     public void emptyMatchesJsonShouldReturnEmptyList() {
         String emptyJson = "{}";
-        List<Match> result = matchFilter.filterMatches(emptyJson);
-
+        List<Match> result = matchFilter.parseMatches(emptyJson);
         Assert.assertNotNull("La lista no debe ser nula ni siquiera con JSON vacío", result);
         Assert.assertTrue("La lista debería estar vacía si el JSON no tiene partidos", result.isEmpty());
     }
