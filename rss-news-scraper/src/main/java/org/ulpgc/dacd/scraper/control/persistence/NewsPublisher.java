@@ -36,7 +36,12 @@ public class NewsPublisher implements NewsStore {
 
     @Override
     public void store(List<NewsArticle> articles) {
+        if (articles.isEmpty()) return;
+
         articles.sort(Comparator.comparing(NewsArticle::pubDate));
+
+        String source = articles.getFirst().source();
+        String team = articles.getFirst().team();
 
         try (Connection connection = createConnection()) {
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -64,10 +69,12 @@ public class NewsPublisher implements NewsStore {
                 eventsPublishedCounter++;
             }
             if (datesUpdated) this.watermarkManager.saveLastDates(lastPublishedDates);
-            System.out.println("Se han enviado " + eventsPublishedCounter + " noticias NUEVAS al topic: '" + topicName + "'...");
+
+            System.out.printf("Fuente: %-18s | Equipo: %-25s | Noticias recolectadas: %d%n",
+                    source, team, eventsPublishedCounter);
 
         } catch (JMSException e) {
-            System.err.println("Error al enviar a ActiveMQ: " + e.getMessage());
+            System.err.println("Fallo al enviar a ActiveMQ: " + e.getMessage());
         }
     }
 

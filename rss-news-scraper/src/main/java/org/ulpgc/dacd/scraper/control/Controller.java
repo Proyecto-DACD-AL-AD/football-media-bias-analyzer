@@ -26,5 +26,7 @@ public class Controller {
                 }
             }
         }
+
+        System.out.println("Ciclo de recoleccion finalizado. Esperando a la proxima ejecucion...\n");
     }
 }
