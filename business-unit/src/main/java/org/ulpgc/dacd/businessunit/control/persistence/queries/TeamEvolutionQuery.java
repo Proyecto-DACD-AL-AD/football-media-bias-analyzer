@@ -50,13 +50,13 @@ public class TeamEvolutionQuery {
                 while (resultSet.next()) {
                     JsonObject dataPoint = new JsonObject();
                     dataPoint.addProperty("date", resultSet.getString("date"));
-                    Double sentimentScore = resultSet.getObject("daily_sentiment", Double.class);
+                    Object sentimentScore = resultSet.getObject("daily_sentiment");
                     if (Objects.nonNull(sentimentScore)) {
-                        dataPoint.addProperty("sentiment", sentimentScore);
+                        dataPoint.addProperty("sentiment", ((Number) sentimentScore).doubleValue());
                     }
-                    Integer teamRank = resultSet.getObject("rank", Integer.class);
+                    Object teamRank = resultSet.getObject("rank");
                     if (Objects.nonNull(teamRank)) {
-                        dataPoint.addProperty("rank", teamRank);
+                        dataPoint.addProperty("rank", ((Number) teamRank).intValue());
                     }
                     results.add(dataPoint);
                 }
