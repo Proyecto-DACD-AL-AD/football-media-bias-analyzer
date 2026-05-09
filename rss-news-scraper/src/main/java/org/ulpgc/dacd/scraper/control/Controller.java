@@ -1,6 +1,5 @@
 package org.ulpgc.dacd.scraper.control;
 
-import org.ulpgc.dacd.scraper.model.NewsArticle;
 import org.ulpgc.dacd.scraper.control.persistence.NewsStore;
 import org.ulpgc.dacd.scraper.control.feeder.NewsScraper;
 
@@ -18,14 +17,11 @@ public class Controller {
     }
 
     public void start() {
-        for (NewsScraper scraper : scrapers) {
-            for (String team : teams) {
-                List<NewsArticle> articles = scraper.feed(team);
-                if (!articles.isEmpty()) {
-                    storer.store(articles);
-                }
-            }
-        }
+        scrapers.stream()
+                .flatMap(scraper -> teams.stream()
+                        .map(scraper::feed))
+                .filter(articles -> !articles.isEmpty())
+                .forEach(storer::store);
 
         System.out.println("Collection cycle completed. Waiting for next run...\n");
     }

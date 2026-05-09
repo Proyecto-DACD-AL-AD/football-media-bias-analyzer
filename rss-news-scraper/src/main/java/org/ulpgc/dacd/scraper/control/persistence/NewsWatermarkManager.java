@@ -27,11 +27,12 @@ public class NewsWatermarkManager {
                 java.lang.reflect.Type stringMapType = new com.google.gson.reflect.TypeToken<Map<String, String>>() {
                 }.getType();
                 Map<String, String> rawMap = serializer.fromJson(json, stringMapType);
-                if (rawMap != null) {
-                    for (Map.Entry<String, String> entry : rawMap.entrySet()) {
-                        newsPaperDatesMap.put(entry.getKey(), Instant.parse(entry.getValue()));
-                    }
-                }
+                if (rawMap == null) return new HashMap<>();
+                return rawMap.entrySet().stream()
+                        .collect(java.util.stream.Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> Instant.parse(entry.getValue())
+                        ));
             }
         } catch (Exception e) {
             System.err.println("Error reading the watermark: " + e.getMessage());

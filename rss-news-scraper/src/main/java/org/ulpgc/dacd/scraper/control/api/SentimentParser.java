@@ -13,20 +13,22 @@ public class SentimentParser {
                     .getAsJsonArray()
                     .get(0)
                     .getAsJsonArray();
-            double positiveScore = 0.0;
-            double negativeScore = 0.0;
 
-            for (JsonElement result : results) {
-                JsonObject prediction = result.getAsJsonObject();
-                String label = prediction.get("label").getAsString();
-                double score = prediction.get("score").getAsDouble();
-
-                if (label.equalsIgnoreCase(POSITIVE_LABEL)) positiveScore = score;
-                else if (label.equalsIgnoreCase(NEGATIVE_LABEL)) negativeScore = score;
-            }
-            return positiveScore - negativeScore;
+            return results.asList().stream()
+                    .map(JsonElement::getAsJsonObject)
+                    .mapToDouble(this::calculateWeightedScore)
+                    .sum();
         } catch (Exception e) {
+            e.printStackTrace();
             return 0.0;
         }
+    }
+
+    private double calculateWeightedScore(JsonObject prediction) {
+        String label = prediction.get("label").getAsString();
+        double score = prediction.get("score").getAsDouble();
+        if (label.equalsIgnoreCase(POSITIVE_LABEL)) return score;
+        if (label.equalsIgnoreCase(NEGATIVE_LABEL)) return -score;
+        return 0.0;
     }
 }
