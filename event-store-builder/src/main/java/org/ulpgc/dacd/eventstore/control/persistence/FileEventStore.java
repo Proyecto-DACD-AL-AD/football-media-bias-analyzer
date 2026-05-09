@@ -10,7 +10,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class FileEventStore implements EventStore {
-
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
             .ofPattern("yyyyMMdd")
             .withZone(ZoneId.of("UTC"));
@@ -32,16 +31,14 @@ public class FileEventStore implements EventStore {
         String tsString = event.get("ts").getAsString();
         Instant timestamp = Instant.parse(tsString);
         String formattedDate = DATE_FORMATTER.format(timestamp);
-
         String directoryPath = baseDirectory + File.separator +
                 topic + File.separator +
                 ss;
 
         File directory = new File(directoryPath);
         if (!directory.exists() && !directory.mkdirs()) {
-            throw new RuntimeException("No se pudo crear el directorio: " + directoryPath);
+            throw new RuntimeException("The directory could not be created: " + directoryPath);
         }
-
         return directoryPath + File.separator + formattedDate + ".events";
     }
 

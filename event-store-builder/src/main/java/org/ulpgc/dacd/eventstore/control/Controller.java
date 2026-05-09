@@ -6,7 +6,6 @@ import org.ulpgc.dacd.eventstore.control.subscriber.Subscriber;
 import java.util.List;
 
 public class Controller {
-
     private final List<Subscriber> subscribers;
     private final EventStore eventStore;
 
@@ -16,8 +15,6 @@ public class Controller {
     }
 
     public void start() {
-        for (Subscriber subscriber : subscribers) {
-            subscriber.startConsuming(eventStore::save);
-        }
+        subscribers.forEach(subscriber -> subscriber.startConsuming(eventStore::save));
     }
 }

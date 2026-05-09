@@ -19,17 +19,14 @@ public class Main {
             connection.start();
 
             EventStore fileStore = new FileEventStore("eventstore");
-
             Subscriber newsSubscriber = new Subscriber(connection, "news", "news-sub");
             Subscriber matchesSubscriber = new Subscriber(connection, "football-matches", "matches-sub");
-
             List<Subscriber> subscribers = Arrays.asList(newsSubscriber, matchesSubscriber);
 
             Controller controller = new Controller(subscribers, fileStore);
             controller.start();
-
         } catch (JMSException e) {
-            System.err.println("Error crítico al iniciar ActiveMQ: " + e.getMessage());
+            System.err.println("Error starting ActiveMQ: " + e.getMessage());
         }
     }
 }
