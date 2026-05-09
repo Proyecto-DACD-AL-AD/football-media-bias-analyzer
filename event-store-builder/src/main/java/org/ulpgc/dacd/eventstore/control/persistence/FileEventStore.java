@@ -36,10 +36,10 @@ public class FileEventStore implements EventStore {
                 ss;
 
         File directory = new File(directoryPath);
-        if (!directory.exists() && !directory.mkdirs()) {
-            throw new RuntimeException("The directory could not be created: " + directoryPath);
+        if (directory.exists() && directory.mkdirs()) {
+            return directoryPath + File.separator + formattedDate + ".events";
         }
-        return directoryPath + File.separator + formattedDate + ".events";
+        throw new RuntimeException("The directory could not be created: " + directoryPath);
     }
 
     private void writeToDisk(String filePath, String content) {
