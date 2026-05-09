@@ -1,6 +1,6 @@
 import org.ulpgc.dacd.api.control.Controller;
 import org.ulpgc.dacd.api.control.feeder.ApiFootballMatchFeeder;
-import org.ulpgc.dacd.api.control.filter.FootballMatchParser;
+import org.ulpgc.dacd.api.control.parser.FootballMatchParser;
 import org.ulpgc.dacd.api.control.persistence.FootballMatchPublisher;
 
 import java.util.concurrent.Executors;

@@ -48,7 +48,6 @@ public class FootballMatchPublisher implements FootballMatchStore {
             }
 
             if (dateUpdated) watermarkManager.saveLastDate(lastPublishedDate);
-
             System.out.println(eventsPublishedCounter + " new messages have been sent to the topic '" + topicName + "'...");
 
         } catch (JMSException e) {

@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.api.control.filter;
+package org.ulpgc.dacd.api.control.parser;
 
 import com.google.gson.*;
 import org.ulpgc.dacd.api.model.Match;
@@ -10,15 +10,11 @@ public class FootballMatchParser {
     public List<Match> parseMatches(String rawMatchesJson) {
         if (isJsonEmpty(rawMatchesJson)) return new ArrayList<>();
         JsonArray matchesArray = extractMatchesArray(rawMatchesJson);
-        List<Match> parsedMatches = new ArrayList<>();
-
-        for (JsonElement rawMatch : matchesArray) {
-            JsonObject matchJson = rawMatch.getAsJsonObject();
-            if (isFinished(matchJson)) {
-                parsedMatches.add(mapToMatch(matchJson));
-            }
-        }
-        return parsedMatches;
+        return matchesArray.asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .filter(this::isFinished)
+                .map(this::mapToMatch)
+                .toList();
     }
 
     private JsonArray extractMatchesArray(String json) {
@@ -57,13 +53,10 @@ public class FootballMatchParser {
         Map<String, Integer> teamRankings = new HashMap<>();
         if (standingsJson.has("standings")) {
             JsonArray standingsArray = standingsJson.getAsJsonArray("standings");
-            for (JsonElement standing: standingsArray) {
-                JsonObject standingJson = standing.getAsJsonObject();
-                if (isTotalType(standingJson)) {
-                    fillRankingsFromTable(standingJson.getAsJsonArray("table"), teamRankings);
-                    break;
-                }
-            }
+            standingsArray.asList().stream()
+                    .map(JsonElement::getAsJsonObject)
+                    .filter(this::isTotalType)
+                    .forEach(standing -> fillRankingsFromTable(standing.getAsJsonArray("table"), teamRankings));
         }
         return teamRankings;
     }
@@ -73,16 +66,16 @@ public class FootballMatchParser {
     }
 
     private void fillRankingsFromTable(JsonArray table, Map<String, Integer> teamRankings) {
-        for (JsonElement position : table) {
-            JsonObject row = position.getAsJsonObject();
-            String teamName = row.getAsJsonObject("team").get("name").getAsString();
-            int teamPosition = row.get("position").getAsInt();
-            teamRankings.put(teamName, teamPosition);
-        }
+        table.asList().stream()
+                .map(JsonElement::getAsJsonObject)
+                .forEach(row -> {
+                    String teamName = row.getAsJsonObject("team").get("name").getAsString();
+                    int teamPosition = row.get("position").getAsInt();
+                    teamRankings.put(teamName, teamPosition);
+                });
     }
 
     private static boolean isJsonEmpty(String rawJson) {
         return rawJson == null || rawJson.trim().equals("{}") || rawJson.trim().isEmpty();
     }
-
 }
