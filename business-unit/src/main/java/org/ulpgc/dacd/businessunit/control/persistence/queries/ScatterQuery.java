@@ -5,18 +5,12 @@ import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ScatterQuery {
     private final DatabaseManager dbManager;
-
-    public ScatterQuery(DatabaseManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public JsonArray execute(String team) {
-        JsonArray results = new JsonArray();
-        String sql = """
-                SELECT
+    private static final String SQL = """
+            SELECT
                 CASE WHEN m.home_team = ? THEN m.home_rank ELSE m.away_rank END as rank,
                 SUM(s.avg_sentiment * s.news_count) / SUM(s.news_count) as day_sentiment,
                 m.date as match_date
@@ -26,24 +20,31 @@ public class ScatterQuery {
             GROUP BY m.date
             """;
 
+    public ScatterQuery(DatabaseManager dbManager) {
+        this.dbManager = dbManager;
+    }
+
+    public JsonArray execute(String team) {
+        JsonArray results = new JsonArray();
         try (Connection conn = dbManager.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = conn.prepareStatement(SQL)) {
 
-            pstmt.setString(1, team);
-            pstmt.setString(2, team);
-            pstmt.setString(3, team);
-            pstmt.setString(4, team);
+            preparedStatement.setString(1, team);
+            preparedStatement.setString(2, team);
+            preparedStatement.setString(3, team);
+            preparedStatement.setString(4, team);
 
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                JsonArray point = new JsonArray();
-                point.add(rs.getInt("rank"));
-                point.add(rs.getDouble("day_sentiment"));
-                point.add(rs.getString("match_date"));
-                results.add(point);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    JsonArray point = new JsonArray();
+                    point.add(resultSet.getInt("rank"));
+                    point.add(resultSet.getDouble("day_sentiment"));
+                    point.add(resultSet.getString("match_date"));
+                    results.add(point);
+                }
             }
-        } catch (Exception e) {
-            System.err.println("Error en ScatterQuery: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Error in ScatterQuery: " + e.getMessage());
         }
         return results;
     }

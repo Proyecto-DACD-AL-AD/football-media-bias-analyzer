@@ -6,9 +6,16 @@ import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class RadarQuery {
     private final DatabaseManager dbManager;
+    private static final String SQL = """
+            SELECT source, SUM(avg_sentiment * news_count) / SUM(news_count) as global_sentiment
+            FROM daily_sentiment
+            WHERE team = ?
+            GROUP BY source
+            """;
 
     public RadarQuery(DatabaseManager dbManager) {
         this.dbManager = dbManager;
@@ -16,26 +23,20 @@ public class RadarQuery {
 
     public JsonArray execute(String team) {
         JsonArray results = new JsonArray();
-
-        String sql = "SELECT source, SUM(avg_sentiment * news_count) / SUM(news_count) as global_sentiment " +
-                "FROM daily_sentiment " +
-                "WHERE team = ? " +
-                "GROUP BY source";
-
         try (Connection conn = dbManager.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = conn.prepareStatement(SQL)) {
 
-            pstmt.setString(1, team);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                JsonObject point = new JsonObject();
-                point.addProperty("source", rs.getString("source"));
-                point.addProperty("sentiment", rs.getDouble("global_sentiment"));
-                results.add(point);
+            preparedStatement.setString(1, team);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    JsonObject point = new JsonObject();
+                    point.addProperty("source", resultSet.getString("source"));
+                    point.addProperty("sentiment", resultSet.getDouble("global_sentiment"));
+                    results.add(point);
+                }
             }
-        } catch (Exception e) {
-            System.err.println("Error en el RadarQuery: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Error in RadarQuery: " + e.getMessage());
         }
         return results;
     }

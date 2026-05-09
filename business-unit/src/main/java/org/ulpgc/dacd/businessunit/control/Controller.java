@@ -22,11 +22,11 @@ public class Controller {
         matchesSubscriber.startConsuming(this::processMatch);
     }
 
-    public void processNews(String topic, JsonObject json) {
-        newsRepository.save(json);
+    public void processNews(String topic, JsonObject newsEvent) {
+        newsRepository.save(newsEvent);
     }
 
-    public void processMatch(String topic, JsonObject json) {
-        matchesRepository.save(json);
+    public void processMatch(String topic, JsonObject matchEvent) {
+        matchesRepository.save(matchEvent);
     }
 }
