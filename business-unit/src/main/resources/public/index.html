@@ -79,7 +79,7 @@
         }
         .dashboard-container {
             flex: 1;
-            padding: 15px 15px 15px 15px;
+            padding: 15px;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
@@ -105,12 +105,66 @@
             color: #8b949e;
             font-weight: 600;
             z-index: 10;
+            display: flex; /* Añadido para el icono */
+            align-items: center;
         }
         .chart-container {
             flex: 1;
             width: 100%;
             margin-top: 25px;
         }
+
+        /* --- ESTILOS DEL ICONO DE INFO Y TOOLTIP --- */
+        .info-wrapper {
+            position: relative;
+            display: inline-flex;
+            margin-left: 8px;
+            cursor: help;
+        }
+        .info-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #8b949e;
+            color: #8b949e;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .info-wrapper:hover .info-icon {
+            color: #fff;
+            border-color: #58a6ff;
+            background-color: #58a6ff;
+        }
+        .info-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            width: 250px;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            text-align: left;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 100;
+            top: 150%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+            font-weight: normal;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+        .info-wrapper:hover .info-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* ------------------------------------------ */
     </style>
 </head>
 <body>
@@ -129,15 +183,33 @@
 
 <div class="dashboard-container">
     <div class="chart-card chart-core">
-        <div class="chart-title">Media Sentiment vs League Rank</div>
+        <div class="chart-title">
+            Media Sentiment vs League Rank
+            <div class="info-wrapper">
+                <div class="info-icon">i</div>
+                <div class="info-tooltip">Displays the correlation between the team's media sentiment score and their league position over time. The tooltip indicates match results (Win/Draw/Loss).</div>
+            </div>
+        </div>
         <div id="thermometerChart" class="chart-container"></div>
     </div>
     <div class="chart-card">
-        <div class="chart-title">Sentiment Bias by Source</div>
+        <div class="chart-title">
+            Sentiment Bias by Source
+            <div class="info-wrapper">
+                <div class="info-icon">i</div>
+                <div class="info-tooltip">Shows the average sentiment score given by different media sources, helping to identify specific biases from individual newspapers.</div>
+            </div>
+        </div>
         <div id="radarChart" class="chart-container"></div>
     </div>
     <div class="chart-card">
-        <div class="chart-title">Media Tolerance Matrix</div>
+        <div class="chart-title">
+            Media Tolerance Matrix
+            <div class="info-wrapper">
+                <div class="info-icon">i</div>
+                <div class="info-tooltip">Scatter plot comparing the team's league rank against their sentiment score. Highlights how forgiving or critical the media is relative to the team's actual performance.</div>
+            </div>
+        </div>
         <div id="scatterChart" class="chart-container"></div>
     </div>
 </div>
@@ -194,7 +266,38 @@
                 backgroundColor: 'transparent',
                 tooltip: {
                     trigger: 'axis',
-                    axisPointer: { type: 'cross' }
+                    axisPointer: { type: 'cross' },
+                    formatter: function (params) {
+                        let html = `<div style="margin-bottom:5px;font-weight:bold;">${params[0].axisValue}</div>`;
+
+                        params.forEach(param => {
+                            let valueStr = '-';
+                            let markerColor = param.color;
+
+                            if (param.seriesName === 'League Rank') {
+                                const rawData = param.data;
+                                const rankVal = rawData[1];
+                                const matchResult = rawData[2];
+
+                                if (rankVal !== null && !isNaN(rankVal)) {
+                                    valueStr = Math.floor(rankVal) + 'º';
+                                }
+
+                                if (matchResult === 'WIN') markerColor = '#3fb950';
+                                else if (matchResult === 'DRAW') markerColor = '#8b949e';
+                                else if (matchResult === 'LOSS') markerColor = '#ff7b72';
+
+                            } else {
+                                if (param.value !== null && !isNaN(param.value)) {
+                                    valueStr = parseFloat(param.value).toFixed(2);
+                                }
+                            }
+
+                            const marker = `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${markerColor};"></span>`;
+                            html += `<div>${marker}${param.seriesName}: <span style="float:right;margin-left:20px;font-weight:bold;">${valueStr}</span></div>`;
+                        });
+                        return html;
+                    }
                 },
                 legend: {
                     data: ['Avg. Sentiment Score', 'League Rank'],
@@ -249,9 +352,6 @@
                                 { offset: 0, color: 'rgba(88, 166, 255, 0.3)' },
                                 { offset: 1, color: 'rgba(88, 166, 255, 0)' }
                             ])
-                        },
-                        tooltip: {
-                            valueFormatter: (value) => (value !== null && !isNaN(value)) ? parseFloat(value).toFixed(2) : '-'
                         }
                     },
                     {
@@ -259,13 +359,14 @@
                         type: 'line',
                         yAxisIndex: 1,
                         connectNulls: true,
-                        data: data.map(item => item.rank !== undefined ? item.rank : null),
+                        data: data.map((item, index) => [
+                            index,
+                            item.rank !== undefined ? item.rank : null,
+                            item.match_result || 'NONE'
+                        ]),
                         itemStyle: { color: '#3fb950' },
                         symbol: 'none',
-                        lineStyle: { type: 'dotted', width: 2 },
-                        tooltip: {
-                            valueFormatter: (value) => (value !== null && !isNaN(value)) ? Math.floor(value) + 'º' : '-'
-                        }
+                        lineStyle: { type: 'dotted', width: 2 }
                     }
                 ]
             };

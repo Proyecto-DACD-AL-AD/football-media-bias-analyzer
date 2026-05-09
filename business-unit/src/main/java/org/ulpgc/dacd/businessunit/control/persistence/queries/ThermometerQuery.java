@@ -18,9 +18,16 @@ public class ThermometerQuery {
         JsonArray results = new JsonArray();
         String sql = """
                 WITH RECURSIVE
-                MinMaxDates AS (
-                    SELECT MIN(substr(date, 1, 10)) as min_date, MAX(substr(date, 1, 10)) as max_date
+                TeamMatches AS (
+                    SELECT substr(date, 1, 10) as match_date,
+                           CASE WHEN home_team = ? THEN home_rank ELSE away_rank END as rank,
+                           CASE WHEN home_goals = away_goals THEN 'DRAW'
+                                WHEN (home_team = ? AND home_goals > away_goals) OR (away_team = ? AND away_goals > home_goals) THEN 'WIN'
+                                ELSE 'LOSS' END as result
                     FROM matches WHERE home_team = ? OR away_team = ?
+                ),
+                MinMaxDates AS (
+                    SELECT MIN(match_date) as min_date, MAX(match_date) as max_date FROM TeamMatches
                 ),
                 DateRange AS (
                     SELECT min_date as date FROM MinMaxDates WHERE min_date IS NOT NULL
@@ -30,34 +37,34 @@ public class ThermometerQuery {
                 )
                 SELECT
                     dr.date,
-                    (SELECT avg_sentiment FROM daily_sentiment WHERE team = ? AND date = dr.date) as daily_sentiment,
-                    (SELECT CASE WHEN home_team = ? THEN home_rank ELSE away_rank END
-                     FROM matches
-                     WHERE (home_team = ? OR away_team = ?) AND substr(date, 1, 10) <= dr.date
-                     ORDER BY date DESC LIMIT 1) as rank
+                    ds.avg_sentiment as daily_sentiment,
+                    (SELECT rank FROM TeamMatches tm WHERE tm.match_date <= dr.date ORDER BY tm.match_date DESC LIMIT 1) as rank,
+                    (SELECT result FROM TeamMatches tm WHERE tm.match_date <= dr.date ORDER BY tm.match_date DESC LIMIT 1) as match_result
                 FROM DateRange dr
+                LEFT JOIN daily_sentiment ds ON ds.team = ? AND ds.date = dr.date
                 """;
 
         try (Connection conn = dbManager.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, team);
-            pstmt.setString(2, team);
-            pstmt.setString(3, team);
-            pstmt.setString(4, team);
-            pstmt.setString(5, team);
-            pstmt.setString(6, team);
+
+            for(int i = 1; i <= 6; i++) {
+                pstmt.setString(i, team);
+            }
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 JsonObject point = new JsonObject();
                 point.addProperty("date", rs.getString("date"));
-                
+
                 double sentiment = rs.getDouble("daily_sentiment");
                 if (!rs.wasNull()) point.addProperty("sentiment", sentiment);
-                
+
                 int rank = rs.getInt("rank");
                 if (!rs.wasNull()) point.addProperty("rank", rank);
-                
+
+                String matchResult = rs.getString("match_result");
+                if (matchResult != null) point.addProperty("match_result", matchResult);
+
                 results.add(point);
             }
         } catch (Exception ignored) {}
