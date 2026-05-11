@@ -107,6 +107,40 @@
         }
     };
 
+    const teamLogoMap = {
+        "FC Barcelona": "barcelona",
+        "Villarreal CF": "villarreal",
+        "Real Madrid CF": "realmadrid",
+        "Club Atlético de Madrid": "atlmadrid",
+        "RCD Espanyol de Barcelona": "espanyol",
+        "Real Betis Balompié": "betis",
+        "Athletic Club": "athletic",
+        "Getafe CF": "getafe",
+        "Elche CF": "elche",
+        "RC Celta de Vigo": "celta",
+        "Deportivo Alavés": "alaves",
+        "Rayo Vallecano de Madrid": "rayovallecano",
+        "Sevilla FC": "sevilla",
+        "Real Sociedad de Fútbol": "realsociedad",
+        "CA Osasuna": "osasuna",
+        "Valencia CF": "valencia",
+        "RCD Mallorca": "mallorca",
+        "Girona FC": "girona",
+        "Real Oviedo": "realoviedo",
+        "Levante UD": "levante"
+    };
+
+    const richLogos = {};
+    for (const team in teamLogoMap) {
+        richLogos[teamLogoMap[team]] = {
+            height: 30,
+            align: 'center',
+            backgroundColor: {
+                image: '/images/' + teamLogoMap[team] + '.png'
+            }
+        };
+    }
+
     const barChart = echarts.init(document.getElementById('barChart'), 'dark');
     const heatmapChart = echarts.init(document.getElementById('heatmapChart'), 'dark');
 
@@ -168,7 +202,7 @@
                     formatter: function(params) {
                         const teamName = params[0].name;
                         const total = params[0].value;
-                        const sources = teamSourceTotals[teamName];
+                        const sources = teamSourceTotals[teamName] || {};
 
                         let html = `<strong>${teamName}</strong><br/>${i18n[currentLang].totalLabel}: <b>${total}</b><br/><hr style="border-color:#30363d; margin:5px 0;">`;
 
@@ -179,7 +213,18 @@
                         return html;
                     }
                 },
-                xAxis: { type: 'category', data: teams, axisLabel: { rotate: 45, interval: 0, fontSize: 10 } },
+                xAxis: {
+                    type: 'category',
+                    data: teams,
+                    axisLabel: {
+                        interval: 0,
+                        formatter: function(val) {
+                            const safe = teamLogoMap[val];
+                            return safe ? '{' + safe + '|}' : val;
+                        },
+                        rich: richLogos
+                    }
+                },
                 yAxis: { type: 'value' },
                 series: [{ name: i18n[currentLang].totalNews, type: 'bar', data: teams.map(t => teamTotals[t]), itemStyle: { color: '#58a6ff' } }]
             });
@@ -187,7 +232,19 @@
             heatmapChart.setOption({
                 backgroundColor: 'transparent',
                 xAxis: { type: 'category', data: i18n[currentLang].days },
-                yAxis: { type: 'category', data: teams, inverse: true, axisLabel: { fontSize: 10 } },
+                yAxis: {
+                    type: 'category',
+                    data: teams,
+                    inverse: true,
+                    axisLabel: {
+                        margin: 15,
+                        formatter: function(val) {
+                            const safe = teamLogoMap[val];
+                            return safe ? '{' + safe + '|}' : val;
+                        },
+                        rich: richLogos
+                    }
+                },
                 visualMap: {
                     min: 0,
                     max: maxNewsCount,

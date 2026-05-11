@@ -6,9 +6,7 @@
     <title>Sports Media Bias Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
             margin: 0; padding: 0;
             background-color: #0d1117; color: #c9d1d9;
@@ -55,14 +53,51 @@
             border: 1px solid #30363d;
         }
 
-        .header-right label { font-size: 0.9rem; color: #8b949e; font-weight: 600; min-width: 130px; text-align: right;}
+        .header-right label { font-size: 0.9rem; color: #8b949e; font-weight: 600; }
 
-        select {
-            background-color: #0d1117; color: #c9d1d9;
-            border: 1px solid #30363d; padding: 8px 16px;
-            border-radius: 4px; font-size: 1rem;
-            outline: none; cursor: pointer;
+        .custom-select-container {
+            position: relative;
+            width: 250px;
+            user-select: none;
         }
+        .select-trigger {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+        .select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .select-options.show { display: block; }
+        .option-item {
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+        .option-item:hover { background-color: #1f6feb; color: #fff; }
+        .option-logo { width: 30px; height: 30px; object-fit: contain; }
+
         .dashboard-container {
             flex: 1; padding: 15px;
             display: grid; grid-template-columns: 1fr 1fr;
@@ -113,8 +148,14 @@
         <button onclick="toggleLang()" class="lang-btn">
             <img id="langImg" class="lang-img" src="/images/en.png" alt="Language">
         </button>
-        <label for="teamSelector" id="labelSelect">Seleccionar Equipo:</label>
-        <select id="teamSelector"></select>
+        <label id="labelSelect">Seleccionar Equipo:</label>
+        <div class="custom-select-container">
+            <div class="select-trigger" id="selectTrigger">
+                <img src="" class="option-logo" id="selectedLogo" style="display:none">
+                <span id="selectedName">...</span>
+            </div>
+            <div class="select-options" id="selectOptions"></div>
+        </div>
     </div>
 </header>
 
@@ -153,6 +194,7 @@
 
 <script>
     let currentLang = 'es';
+    let currentTeam = '';
     const i18n = {
         es: {
             img: '/images/en.png', label: 'Seleccionar Equipo:', navInd: 'Vista Individual', navGlob: 'Vista Global',
@@ -172,6 +214,17 @@
         }
     };
 
+    const teamLogoMap = {
+        "FC Barcelona": "barcelona", "Villarreal CF": "villarreal", "Real Madrid CF": "realmadrid",
+        "Club Atlético de Madrid": "atlmadrid", "RCD Espanyol de Barcelona": "espanyol",
+        "Real Betis Balompié": "betis", "Athletic Club": "athletic", "Getafe CF": "getafe",
+        "Elche CF": "elche", "RC Celta de Vigo": "celta", "Deportivo Alavés": "alaves",
+        "Rayo Vallecano de Madrid": "rayovallecano", "Sevilla FC": "sevilla",
+        "Real Sociedad de Fútbol": "realsociedad", "CA Osasuna": "osasuna",
+        "Valencia CF": "valencia", "RCD Mallorca": "mallorca", "Girona FC": "girona",
+        "Real Oviedo": "realoviedo", "Levante UD": "levante"
+    };
+
     const thermometerChart = echarts.init(document.getElementById('thermometerChart'), 'dark');
     const radarChart = echarts.init(document.getElementById('radarChart'), 'dark');
     const scatterChart = echarts.init(document.getElementById('scatterChart'), 'dark');
@@ -188,9 +241,38 @@
         document.getElementById('tip2').innerText = i18n[currentLang].tip2;
         document.getElementById('title3').innerText = i18n[currentLang].t3;
         document.getElementById('tip3').innerText = i18n[currentLang].tip3;
-        const team = document.getElementById('teamSelector').value;
-        if (team) { loadThermometerData(team); loadRadarData(team); loadScatterData(team); }
+        if (currentTeam) { loadCharts(currentTeam); }
     }
+
+    function selectTeam(team) {
+        currentTeam = team;
+        const triggerLogo = document.getElementById('selectedLogo');
+        const triggerName = document.getElementById('selectedName');
+        const safeName = teamLogoMap[team];
+
+        triggerLogo.src = `/images/${safeName}.png`;
+        triggerLogo.style.display = 'block';
+        triggerName.innerText = team;
+
+        document.getElementById('selectOptions').classList.remove('show');
+        loadCharts(team);
+    }
+
+    function loadCharts(team) {
+        loadThermometerData(team);
+        loadRadarData(team);
+        loadScatterData(team);
+    }
+
+    document.getElementById('selectTrigger').addEventListener('click', () => {
+        document.getElementById('selectOptions').classList.toggle('show');
+    });
+
+    window.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select-container')) {
+            document.getElementById('selectOptions').classList.remove('show');
+        }
+    });
 
     window.addEventListener('resize', () => {
         thermometerChart.resize(); radarChart.resize(); scatterChart.resize();
@@ -200,21 +282,21 @@
         try {
             const response = await fetch('http://localhost:8080/api/teams');
             const teams = await response.json();
-            const selector = document.getElementById('teamSelector');
+            const optionsContainer = document.getElementById('selectOptions');
+
             teams.forEach(team => {
-                const option = document.createElement('option');
-                option.value = team; option.textContent = team;
-                selector.appendChild(option);
+                const div = document.createElement('div');
+                div.className = 'option-item';
+                const safe = teamLogoMap[team];
+                div.innerHTML = `<img src="/images/${safe}.png" class="option-logo"><span>${team}</span>`;
+                div.onclick = () => selectTeam(team);
+                optionsContainer.appendChild(div);
             });
+
             const defaultTeam = "Deportivo Alavés";
-            const selectedTeam = teams.includes(defaultTeam) ? defaultTeam : teams[0];
-            if (selectedTeam) {
-                selector.value = selectedTeam;
-                loadThermometerData(selectedTeam); loadRadarData(selectedTeam); loadScatterData(selectedTeam);
-            }
-            selector.addEventListener('change', (e) => {
-                loadThermometerData(e.target.value); loadRadarData(e.target.value); loadScatterData(e.target.value);
-            });
+            const startTeam = teams.includes(defaultTeam) ? defaultTeam : teams[0];
+            if (startTeam) selectTeam(startTeam);
+
         } catch (error) { console.error(error); }
     }
 
