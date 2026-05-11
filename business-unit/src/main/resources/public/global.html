@@ -197,6 +197,7 @@
 
             barChart.setOption({
                 backgroundColor: 'transparent',
+                grid: { containLabel: true, bottom: '5%' },
                 tooltip: {
                     trigger: 'axis',
                     formatter: function(params) {
@@ -218,6 +219,7 @@
                     data: teams,
                     axisLabel: {
                         interval: 0,
+                        hideOverlap: false,
                         formatter: function(val) {
                             const safe = teamLogoMap[val];
                             return safe ? '{' + safe + '|}' : val;
@@ -231,12 +233,15 @@
 
             heatmapChart.setOption({
                 backgroundColor: 'transparent',
+                grid: { containLabel: true, bottom: '15%' },
                 xAxis: { type: 'category', data: i18n[currentLang].days },
                 yAxis: {
                     type: 'category',
                     data: teams,
                     inverse: true,
                     axisLabel: {
+                        interval: 0,
+                        hideOverlap: false,
                         margin: 15,
                         formatter: function(val) {
                             const safe = teamLogoMap[val];
