@@ -7,87 +7,16 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #0d1117;
-            color: #c9d1d9;
+            margin: 0; padding: 0;
+            background-color: #0d1117; color: #c9d1d9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            height: 100vh; display: flex; flex-direction: column;
         }
         header {
-            height: 60px;
-            background-color: #161b22;
+            height: 60px; background-color: #161b22;
             border-bottom: 1px solid #30363d;
-            display: flex;
-            align-items: center;
-            padding: 10px 25px;
-            gap: 35px;
-            box-sizing: border-box;
-        }
-        header h1 {
-            font-size: 1.2rem;
-            margin: 0;
-            color: #58a6ff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        nav {
-            display: flex;
-            gap: 25px;
-            align-items: center;
-        }
-        nav a {
-            text-decoration: none;
-            font-size: 0.95rem;
-            color: #8b949e;
-            transition: all 0.3s ease;
-            padding: 5px 0;
-        }
-        nav a:hover {
-            color: #ffffff;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-        }
-        nav a.active {
-            color: #58a6ff;
-            font-weight: bold;
-        }
-        .global-container {
-            flex: 1;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 100%;
-            gap: 20px;
-        }
-        .chart-card {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        .chart-title {
-            color: #8b949e;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: flex; /* Añadido para el icono */
-            align-items: center;
-        }
-        .chart-container {
-            flex: 1;
-            width: 100%;
-        }
-
-        /* --- ESTILOS DEL ICONO DE INFO Y TOOLTIP --- */
-        .info-wrapper {
-            position: relative;
-            display: inline-flex;
-            margin-left: 8px;
-            cursor: help;
+            display: flex; align-items: center;
+            padding: 10px 25px; gap: 35px; box-sizing: border-box;
         }
         header h1 { font-size: 1.2rem; margin: 0; color: #58a6ff; text-transform: uppercase; letter-spacing: 1px; }
         nav { display: flex; gap: 25px; align-items: center; }
@@ -152,7 +81,7 @@
             <span id="title2">Frecuencia Semanal de Noticias</span>
             <div class="info-wrapper">
                 <div class="info-icon">i</div>
-                <div class="info-tooltip" id="tip2">Mapa de calor que muestra el volumen de noticias por día de la semana. Un azul más claro indica mayor frecuencia.</div>
+                <div class="info-tooltip" id="tip2">Mapa de calor que muestra el volumen de noticias por día de la semana.</div>
             </div>
         </div>
         <div id="heatmapChart" class="chart-container"></div>
@@ -166,13 +95,15 @@
             img: '/images/en.png', navInd: 'Vista Individual', navGlob: 'Vista Global',
             t1: 'Cobertura Mediática por Equipo', tip1: 'Número total de noticias por equipo, destacando qué equipos dominan el panorama mediático.',
             t2: 'Frecuencia Semanal de Noticias', tip2: 'Mapa de calor que muestra el volumen de noticias por día de la semana.',
-            totalNews: 'Total Noticias', freq: 'Frecuencia', days: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+            totalNews: 'Total Noticias', freq: 'Frecuencia', days: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            totalLabel: 'Total'
         },
         en: {
             img: '/images/es.png', navInd: 'Individual View', navGlob: 'Global View',
             t1: 'Media Coverage by Team', tip1: 'Total number of news articles per team, highlighting which teams dominate the media landscape.',
-            t2: 'Weekly News Frequency', tip2: 'Heatmap showing news volume per day of the week. A lighter blue color translates to a higher volume of news.',
-            totalNews: 'Total News', freq: 'Frequency', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            t2: 'Weekly News Frequency', tip2: 'Heatmap showing news volume per day of the week.',
+            totalNews: 'Total News', freq: 'Frequency', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            totalLabel: 'Total'
         }
     };
 
@@ -197,19 +128,57 @@
         try {
             const response = await fetch('http://localhost:8080/api/global-stats');
             const rawData = await response.json();
+
             const teamTotals = {};
-            rawData.forEach(item => { teamTotals[item.team] = (teamTotals[item.team] || 0) + item.count; });
+            const teamSourceTotals = {};
+            const heatmapAgg = {};
+
+            rawData.forEach(item => {
+                teamTotals[item.team] = (teamTotals[item.team] || 0) + item.count;
+
+                if(!teamSourceTotals[item.team]) {
+                    teamSourceTotals[item.team] = {};
+                }
+                teamSourceTotals[item.team][item.source] = (teamSourceTotals[item.team][item.source] || 0) + item.count;
+
+                const key = item.team + '||' + item.day;
+                heatmapAgg[key] = (heatmapAgg[key] || 0) + item.count;
+            });
+
             const teams = Object.keys(teamTotals).sort((a, b) => teamTotals[b] - teamTotals[a]);
             const heatmapPoints = [];
-            rawData.forEach(item => {
-                const teamIdx = teams.indexOf(item.team);
-                let adjustedDay = item.day === 0 ? 6 : item.day - 1;
-                heatmapPoints.push([adjustedDay, teamIdx, item.count]);
-            });
+            let maxNewsCount = 20;
+
+            for (const key in heatmapAgg) {
+                const parts = key.split('||');
+                const teamName = parts[0];
+                const day = parseInt(parts[1]);
+                const teamIdx = teams.indexOf(teamName);
+
+                let adjustedDay = day === 0 ? 6 : day - 1;
+                let c = heatmapAgg[key];
+                heatmapPoints.push([adjustedDay, teamIdx, c]);
+                if (c > maxNewsCount) maxNewsCount = c;
+            }
 
             barChart.setOption({
                 backgroundColor: 'transparent',
-                tooltip: { trigger: 'axis' },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const teamName = params[0].name;
+                        const total = params[0].value;
+                        const sources = teamSourceTotals[teamName];
+
+                        let html = `<strong>${teamName}</strong><br/>${i18n[currentLang].totalLabel}: <b>${total}</b><br/><hr style="border-color:#30363d; margin:5px 0;">`;
+
+                        const sortedSources = Object.keys(sources).sort((a, b) => sources[b] - sources[a]);
+                        sortedSources.forEach(src => {
+                            html += `<div style="display:flex; justify-content:space-between; font-size:12px; gap:15px;"><span>${src}:</span> <strong>${sources[src]}</strong></div>`;
+                        });
+                        return html;
+                    }
+                },
                 xAxis: { type: 'category', data: teams, axisLabel: { rotate: 45, interval: 0, fontSize: 10 } },
                 yAxis: { type: 'value' },
                 series: [{ name: i18n[currentLang].totalNews, type: 'bar', data: teams.map(t => teamTotals[t]), itemStyle: { color: '#58a6ff' } }]
@@ -219,7 +188,16 @@
                 backgroundColor: 'transparent',
                 xAxis: { type: 'category', data: i18n[currentLang].days },
                 yAxis: { type: 'category', data: teams, inverse: true, axisLabel: { fontSize: 10 } },
-                visualMap: { min: 0, max: 20, orient: 'horizontal', left: 'center', bottom: '0%', inRange: { color: ['#0d1117', '#1f6feb', '#58a6ff'] } },
+                visualMap: {
+                    min: 0,
+                    max: maxNewsCount,
+                    calculable: true,
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: '0%',
+                    inRange: { color: ['#161b22', '#003d82', '#1f6feb', '#58a6ff', '#a5d6ff'] },
+                    textStyle: { color: '#c9d1d9' }
+                },
                 series: [{ name: i18n[currentLang].freq, type: 'heatmap', data: heatmapPoints }]
             });
         } catch (e) { console.error(e); }
