@@ -1,12 +1,12 @@
 package org.ulpgc.dacd.businessunit.control.config;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.ulpgc.dacd.businessunit.control.Controller;
+import org.ulpgc.dacd.businessunit.control.RepositoryController;
+import org.ulpgc.dacd.businessunit.control.SubscriberController;
 import org.ulpgc.dacd.businessunit.control.api.DashboardApi;
 import org.ulpgc.dacd.businessunit.control.persistence.EventReader;
 import org.ulpgc.dacd.businessunit.control.persistence.DatabaseManager;
 import org.ulpgc.dacd.businessunit.control.persistence.repositories.DashboardRepository;
-import org.ulpgc.dacd.businessunit.control.persistence.repositories.EventRepository;
 import org.ulpgc.dacd.businessunit.control.subscriber.Subscriber;
 import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;
@@ -33,15 +33,15 @@ public class Initializer {
         return connection;
     }
 
-    public Controller buildController(Connection connection, EventRepository newsRepository, EventRepository matchesRepository) {
+    public SubscriberController buildSubscriberController(Connection connection, RepositoryController repositoryController) {
         Subscriber newsSub = new Subscriber(connection, "news", "business-news-sub");
         Subscriber matchesSub = new Subscriber(connection, "football-matches", "business-matches-sub");
-        return new Controller(newsSub, matchesSub, newsRepository, matchesRepository);
+        return new SubscriberController(newsSub, matchesSub, repositoryController);
     }
 
-    public void loadHistoricalData(Controller controller) {
-        new EventReader(EVENT_STORE_PATH, "news").readStore(controller::processNews);
-        new EventReader(EVENT_STORE_PATH, "football-matches").readStore(controller::processMatch);
+    public void loadHistoricalData(RepositoryController repositoryController) {
+        new EventReader(EVENT_STORE_PATH, "news").readStore(repositoryController::processNews);
+        new EventReader(EVENT_STORE_PATH, "football-matches").readStore(repositoryController::processMatch);
     }
 
     public DashboardApi buildApi(DashboardRepository dashboardRepository) {
