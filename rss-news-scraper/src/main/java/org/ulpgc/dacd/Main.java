@@ -26,10 +26,8 @@ public class Main {
         Controller controller = new Controller(feeders, store, teams);
 
         System.out.println("Starting RSS news collector...");
-        try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1)) {
-            scheduler.scheduleAtFixedRate(controller::start, 0, 12, TimeUnit.HOURS);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(controller::start, 0, 12, TimeUnit.HOURS);
     }
 }
