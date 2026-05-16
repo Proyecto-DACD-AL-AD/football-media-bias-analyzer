@@ -29,14 +29,17 @@ sports-media-bias-analyzer/
 ├── football-api-client/    # Feeder: Ingesta de datos de resultados deportivos
 ├── rss-news-scraper/       # Feeder: Ingesta y análisis de sentimiento de noticias
 ├── event-store-builder/    # Suscriptor: Almacenamiento histórico de eventos en crudo
-├── business-unit/          # Datamart, lógica de negocio y servidor web (Dashboard API)
+├── business-unit/          # Lógica de negocio y servidor web (Dashboard API)
+├── datamart/               # Datamart, archivo SQLite .db
+├── eventstore/             # Almacenamiento de todos los .events crudos para ambos feeders
+├── state/                  # Alamacena las fechas de las últimas noticias/partidos obtenidos para no volver a almacenarlos (no incluido en git)
 ├── documentation/          # Archivos de diagramas (UML) y recursos de documentación
 ├── application.properties  # Archivo centralizado de configuración y tokens (no incluido en git)
 └── README.md
 ````
 
-## 4. Módulos y Diagramas de Clases
-A continuación, se detalla la lógica interna de cada módulo de la arquitectura y su correspondiente diseño de clases.
+## 4. Módulos y Directorios del proyecto
+A continuación, se detalla la lógica interna de cada módulo de la arquitectura y su correspondiente diseño de clases; así como también la función de cada directorio adicional.
 
 ### 4.1. Feeders (Publishers)
 Son los módulos encargados de la recolección continua de datos desde fuentes externas para publicarlos en el broker de mensajería (ActiveMQ). Se dividen en dos proyectos independientes:
@@ -62,7 +65,7 @@ El corazón del análisis. Este módulo consume los eventos (en tiempo real o en
 ![Diagrama de clases](ruta-a-la-imagen-arquitectura.png)
 
 
-## 5. Fuentes de Datos y Datamart
+## 5. Fuentes de Datos, Datamart y almacenamiento
 ### 5.1. Justificación de Fuentes
 - **Deportivas (API-Football)**: Elegida por su fiabilidad, accesibilidad gratuita y por proporcionar todos los datos necesarios sobre resultados y jornadas de LaLiga.
 
@@ -70,7 +73,56 @@ El corazón del análisis. Este módulo consume los eventos (en tiempo real o en
 
 - **Análisis de Sentimiento (Hugging Face API)**: Se decidió calcular la nota de sentimiento de cada noticia directamente en la fase de captura (Feeder). Dado que la API tarda aproximadamente un segundo por petición, delegar esto al inicio del flujo evita cuellos de botella en la Business Unit, garantizando fluidez en la interfaz de usuario (UI) y un procesamiento de eventos constante.
 
-### 5.2. Estructura del Datamart
+### 5.2. Estructura del event-store
+El módulo `event-store-builder` persiste los mensajes en crudo organizados jerárquicamente por tópico y fecha de ingesta (`YYYYMMDD`). Este almacenamiento actúa como nuestra Fuente de Verdad Absoluta, permitiendo a la `business-unit` regenerar el Datamart en diferido (re-play) sin necesidad de volver a consumir las APIs externas o realizar scraping.
+
+#### Estructura de directorios:
+```text
+eventstore/
+├── football-matches/
+│   └──  football-api
+│        └── YYYYMMDD.events
+└── news/
+    └──  rss-scraper
+         └── YYYYMMDD.events
+```
+
+#### Estructura de los eventos (`.events`):
+Cada fichero contiene eventos independientes por línea en formato JSON. Se han diseñado dos esquemas de eventos distintos dependiendo del Feeder, incluyendo siempre metadatos de trazabilidad como ss (Source System) y ts (Timestamp):
+
+1. Evento de Noticias y Sentimiento (Tópico: `sports.news`):
+
+```JSON
+{
+  "title": "(Titular de la noticia)",
+  "summary": "(Resumen de la noticia)",
+  "link": "(URL)",
+  "pubDate": "(Fecha de publicación)",
+  "source": "(Periódico del que ha sido obtenido)",
+  "team": "(Equipo sobre el que trata)",
+  "sentimentScore": (Puntuación en rango (-1 = neg, 1 = pos)),
+  "ss": "rss-scraper",
+  "ts": "(timestamp [format: ISO 8601])"
+}
+```
+2. Evento de Resultados Deportivos (Tópico: `sports.football.matches`):
+
+```JSON
+{
+  "date": "(Fecha en la que se ha disputado el partido)",
+  "matchday": (Jornada),
+  "homeTeam": "(Equipo local)",
+  "awayTeam": "(Equipo visitante)",
+  "homeGoals": (Goles del equipo local),
+  "awayGoals": (Goles del equipo visitante),
+  "homeRankAfterMatchday": (Puesto en la clasificación del equipo local tras terminar el partido),
+  "awayRankAfterMatchday": (Puesto en la clasificación del equipo visitante tras terminar el partido),
+  "ss": "football-api",
+  "ts": "(timestamp [format: ISO 8601])"
+}
+```
+
+### 5.3. Estructura del Datamart
 El sistema centraliza la información en una base de datos SQLite estructurada para optimizar las consultas de la UI. Consta de tres tablas principales:
 
 - **Registro de Noticias (Escudo anti-duplicados)**: Almacena el equipo y la URL de la noticia. Garantiza la idempotencia evitando procesar la misma noticia dos veces.
@@ -123,7 +175,10 @@ Para desplegar el proyecto desde cero, los módulos deben levantarse en el sigui
 5. **Acceso a la Interfaz**: Abrir cualquier navegador web y acceder a la URL: `http://localhost:8080/index.html`
 
 ## 8. Ejemplos de Uso
-(...)
+<img width="1918" height="1075" alt="image" src="https://github.com/user-attachments/assets/c90b2000-997c-4198-9947-09d5232022da" />
+<img width="1918" height="1078" alt="Captura de pantalla 2026-05-16 131731" src="https://github.com/user-attachments/assets/445a0a5e-0a47-4cb8-aadd-26476df0ea03" />
+
+---
 
 <p align="center">
   <img width="50%" alt="image" src="https://github.com/user-attachments/assets/b4c47d04-6ee6-4bc7-af93-7d05c473e2d6" />
