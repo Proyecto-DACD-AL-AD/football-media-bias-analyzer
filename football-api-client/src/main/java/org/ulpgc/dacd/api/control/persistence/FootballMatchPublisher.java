@@ -6,6 +6,7 @@ import jakarta.jms.*;
 import org.ulpgc.dacd.api.model.Match;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -26,7 +27,9 @@ public class FootballMatchPublisher implements FootballMatchStore {
 
     @Override
     public void store(List<Match> matches) {
-        matches.sort(Comparator.comparing(Match::date));
+        List<Match> sortedMatches = new ArrayList<>(matches);
+        sortedMatches.sort(Comparator.comparing(Match::date));
+
         try (Connection connection = createConnection()) {
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = session.createTopic(topicName);
@@ -34,7 +37,7 @@ public class FootballMatchPublisher implements FootballMatchStore {
             boolean dateUpdated = false;
             int eventsPublishedCounter = 0;
 
-            for (Match match : matches) {
+            for (Match match : sortedMatches) {
                 Instant matchDate = match.date();
                 if (matchDate.isAfter(lastPublishedDate)) {
                     String jsonEvent = serializer.toJson(match);
