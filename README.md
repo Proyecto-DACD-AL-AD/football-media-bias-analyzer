@@ -65,16 +65,17 @@ El corazón del análisis. Este módulo consume los eventos (en tiempo real o en
 ![Diagrama de clases](ruta-a-la-imagen-arquitectura.png)
 
 
-## 5. Fuentes de Datos, Datamart y almacenamiento
-### 5.1. Justificación de Fuentes
+## 5. Fuentes de Datos
 - **Deportivas (API-Football)**: Elegida por su fiabilidad, accesibilidad gratuita y por proporcionar todos los datos necesarios sobre resultados y jornadas de LaLiga.
 
 - **Noticias (RSS Scraping)**: Se han extraído los canales RSS de *Marca*, *AS* y *Mundo Deportivo* al ser los tres medios deportivos más influyentes de España. El formato XML de los RSS facilita una extracción limpia.
 
-- **Análisis de Sentimiento (Hugging Face API)**: Se decidió calcular la nota de sentimiento de cada noticia directamente en la fase de captura (Feeder). Dado que la API tarda aproximadamente un segundo por petición, delegar esto al inicio del flujo evita cuellos de botella en la Business Unit, garantizando fluidez en la interfaz de usuario (UI) y un procesamiento de eventos constante.
+- **Análisis de Sentimiento (Hugging Face API)**: Se ha integrado el modelo multilingüe preentrenado `cardiffnlp/twitter-xlm-roberta-base-sentiment` a través de la API de Hugging Face.
+  - Por defecto, este modelo procesa el texto y devuelve tres valores de probabilidad independientes (negativo, neutro y positivo) en un rango de 0 a 1. Para poder comparar empíricamente las noticias en el Datamart, normalizamos estas salidas obteniendo una única puntuación ponderada en el rango de [-1, 1], usando la fórmula: $Puntuación = (P_{pos} \times 1) + (P_{neu} \times 0) + (P_{neg} \times (-1))$.
 
-### 5.2. Estructura del event-store
-El módulo `event-store-builder` persiste los mensajes en crudo organizados jerárquicamente por tópico y fecha de ingesta (`YYYYMMDD`). Este almacenamiento actúa como nuestra Fuente de Verdad Absoluta, permitiendo a la `business-unit` regenerar el Datamart en diferido (re-play) sin necesidad de volver a consumir las APIs externas o realizar scraping.
+## 6. Almacenamiento
+### 6.1. Estructura del event-store
+El módulo `event-store-builder` persiste los mensajes organizados jerárquicamente por tópico y fecha de ingesta (`YYYYMMDD`). Este almacenamiento actúa como nuestra fuente de datos reales en crudo, permitiendo a la `business-unit` regenerar el Datamart en diferido (re-play) sin necesidad de volver a consumir las APIs externas o realizar scraping.
 
 #### Estructura de directorios:
 ```text
@@ -90,7 +91,7 @@ eventstore/
 #### Estructura de los eventos (`.events`):
 Cada fichero contiene eventos independientes por línea en formato JSON. Se han diseñado dos esquemas de eventos distintos dependiendo del Feeder, incluyendo siempre metadatos de trazabilidad como ss (Source System) y ts (Timestamp):
 
-1. Evento de Noticias y Sentimiento (Tópico: `sports.news`):
+1. Evento de Noticias (Tópico: `news`):
 
 ```JSON
 {
@@ -100,41 +101,68 @@ Cada fichero contiene eventos independientes por línea en formato JSON. Se han 
   "pubDate": "(Fecha de publicación)",
   "source": "(Periódico del que ha sido obtenido)",
   "team": "(Equipo sobre el que trata)",
-  "sentimentScore": (Puntuación en rango (-1 = neg, 1 = pos)),
+  "sentimentScore": "(Puntuación en rango (-1 = neg, 1 = pos) [Double])",
   "ss": "rss-scraper",
   "ts": "(timestamp [format: ISO 8601])"
 }
 ```
-2. Evento de Resultados Deportivos (Tópico: `sports.football.matches`):
+2. Evento de Resultados de Partidos (Tópico: `football.matches`):
 
 ```JSON
 {
   "date": "(Fecha en la que se ha disputado el partido)",
-  "matchday": (Jornada),
+  "matchday": "(Jornada [Integer])",
   "homeTeam": "(Equipo local)",
   "awayTeam": "(Equipo visitante)",
-  "homeGoals": (Goles del equipo local),
-  "awayGoals": (Goles del equipo visitante),
-  "homeRankAfterMatchday": (Puesto en la clasificación del equipo local tras terminar el partido),
-  "awayRankAfterMatchday": (Puesto en la clasificación del equipo visitante tras terminar el partido),
+  "homeGoals": "(Goles del equipo local [Integer])",
+  "awayGoals": "(Goles del equipo visitante [Integer])",
+  "homeRankAfterMatchday": "(Puesto en la clasificación del equipo local tras terminar el partido [Integer])",
+  "awayRankAfterMatchday": "(Puesto en la clasificación del equipo visitante tras terminar el partido [Integer])",
   "ss": "football-api",
   "ts": "(timestamp [format: ISO 8601])"
 }
 ```
 
-### 5.3. Estructura del Datamart
-El sistema centraliza la información en una base de datos SQLite estructurada para optimizar las consultas de la UI. Consta de tres tablas principales:
+### 6.2. Estructura del Datamart
+El sistema centraliza la información en una base de datos **SQLite** implementada a través de la API estándar **JDBC** de Java. Se ha elegido esta tecnología por ser un motor de base de datos ligero, transaccional y *serverless* (no requiere la instalación de un servidor independiente). Esto facilita enormemente el despliegue del proyecto y su portabilidad, manteniendo un alto rendimiento en las consultas analíticas de la interfaz.
 
-- **Registro de Noticias (Escudo anti-duplicados)**: Almacena el equipo y la URL de la noticia. Garantiza la idempotencia evitando procesar la misma noticia dos veces.
+La base de datos está modelada para optimizar la respuesta visual del Dashboard y consta de tres tablas principales:
 
-- **Agregación Diaria de Noticias**: Almacena la puntuación media de sentimiento por día, el número total de noticias diarias para cada periódico y el equipo correspondiente.
+#### 6.2.1. Tabla `processed_news` (Protección anti-duplicados)
+Garantiza la idempotencia del sistema y el desacoplamiento entre módulos. Almacena las URLs de las noticias ya procesadas en la base de datos para evitar que duplicados de ActiveMQ o recargas del historial corrompan las estadísticas. Aunque ya evitamos duplicados al guardar en los .events, delegar esta validación final a la base de datos (con claves *UNIQUE*) permite una comprobación instantánea y evita que este módulo tenga que acoplarse a leer y parsear pesados archivos de texto secuenciales para saber si una noticia ya fue procesada.
 
-- **Resultados Deportivos**: Guarda los marcadores e historial de partidos por jornada para cada equipo.
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| **url** | TEXT (PK) | Enlace único de la noticia. Actúa como Clave Primaria. |
+| **team** | TEXT | Equipo al que hace referencia la noticia. |
 
-![Diagrama de clases](ruta-a-la-imagen-arquitectura.png)
+#### 6.2.2. Tabla `daily_sentiment` (Agregación de Noticias)
+Centraliza las métricas de sentimiento ya calculadas. En lugar de almacenar cada noticia de manera individual, esta tabla guarda únicamente la media ponderada del día para simplificar el acceso a los datos y optimizar el renderizado de las gráficas en la interfaz. Esta agregación diaria se calcula de forma continua para todas las noticias recolectadas, independientemente de si ese día se ha disputado un partido de liga o no.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| **date** | TEXT (PK) | Fecha del día en el que se publican las noticias (YYYY-MM-DD). |
+| **source** | TEXT (PK) | Periódico deportivo (Marca, AS, Mundo Deportivo). |
+| **team** | TEXT (PK) | Nombre del equipo analizado. |
+| **average_sentiment** | REAL | Nota media ponderada del sentimiento en el rango `[-1, 1]`. |
+| **news_count** | INTEGER | Volumen total de noticias publicadas ese día. |
+
+#### 6.2.3. Tabla `matches` (Resultados Deportivos)
+Guarda el histórico de partidos de LaLiga. Nos permite acceder tanto a todos los resultados como al histórico de la clasificación de cada equipo.
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| **date** | TEXT | Fecha exacta del encuentro (Formato ISO 8601). |
+| **matchday** | INTEGER | Número de la jornada de competición. |
+| **home_team** | TEXT | Nombre del equipo local. |
+| **away_team** | TEXT | Nombre del equipo visitante. |
+| **home_goals** | INTEGER | Goles anotados por el equipo local. |
+| **away_goals** | INTEGER | Goles anotados por el equipo visitante. |
+| **home_rank** | INTEGER | Posición en la clasificación del local tras el partido. |
+| **away_rank** | INTEGER | Posición en la clasificación del visitante tras el partido. |
 
 
-## 6. Principios y Patrones de Diseño
+## 7. Principios y Patrones de Diseño
 El desarrollo se ha guiado por los principios SOLID, buscando un código limpio, modular y mantenible. Destacan los siguientes patrones de diseño:
 
 - **Publisher/Subscriber**: Implementado transversalmente con ActiveMQ y JMS para desacoplar la recolección de la lógica de negocio.
@@ -145,15 +173,15 @@ El desarrollo se ha guiado por los principios SOLID, buscando un código limpio,
 
 - **MVC / API Controller**: Separación clara en la Business Unit entre las rutas de la API (DashboardApi), los controladores lógicos y las vistas (archivos estáticos HTML/JS).
 
-## 7. Instrucciones de Ejecución
-### 7.1. Requisitos Previos
+## 8. Instrucciones de Ejecución
+### 8.1. Requisitos Previos
 ```text
 Java 21
 Apache Maven
 ActiveMQ (Servicio local)
 ```
 
-### 7.2. Configuración
+### 8.2. Configuración
 Las claves de los servicios externos deben configurarse en un archivo centralizado llamado `application.properties` situado en el directorio raíz del proyecto. Este enfoque es seguro y evita incrustar credenciales directamente en el código fuente.
 El contenido debe seguir esta estructura exacta:
 
@@ -161,7 +189,7 @@ El contenido debe seguir esta estructura exacta:
 huggingface.api.token=TOKEN_DE_HUGGINGFACE
 football.api.token=TOKEN_DE_API_FOOTBALL
 ```
-### 7.3. Orden de Ejecución
+### 8.3. Orden de Ejecución
 Para desplegar el proyecto desde cero, los módulos deben levantarse en el siguiente orden estricto:
 
 1. **Arrancar ActiveMQ**: Iniciar el broker de mensajería en el entorno local.
@@ -174,7 +202,7 @@ Para desplegar el proyecto desde cero, los módulos deben levantarse en el sigui
 
 5. **Acceso a la Interfaz**: Abrir cualquier navegador web y acceder a la URL: `http://localhost:8080/index.html`
 
-## 8. Ejemplos de Uso
+## 9. Ejemplos de Uso
 <img width="1918" height="1075" alt="image" src="https://github.com/user-attachments/assets/c90b2000-997c-4198-9947-09d5232022da" />
 <img width="1918" height="1078" alt="Captura de pantalla 2026-05-16 131731" src="https://github.com/user-attachments/assets/445a0a5e-0a47-4cb8-aadd-26476df0ea03" />
 
