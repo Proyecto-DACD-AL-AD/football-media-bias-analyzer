@@ -173,6 +173,8 @@ El desarrollo se ha guiado por los principios SOLID, buscando un código limpio,
 
 - **MVC / API Controller**: Separación clara en la Business Unit entre las rutas de la API (DashboardApi), los controladores lógicos y las vistas (archivos estáticos HTML/JS).
 
+- **Monitorización y Trazabilidad (Logging):** Como pilar fundamental de la monitorización del sistema, se ha implementado un registro de *Logs* unificado en todos los módulos. Todos los mensajes están estandarizados y redactados en inglés. Esta práctica responde a la necesidad crítica de saber "¿qué ha ocurrido?" en tiempo de ejecución, permitiéndonos detectar fallos, entender el estado de la aplicación y facilitar enormemente la depuración ante posibles problemas en producción. Se han utilizado diferentes niveles de severidad (`INFO`, `WARN`, `ERROR`, etc.) siguiendo las mejores prácticas para no saturar la salida y registrar solo la información histórica relevante.
+
 ## 8. Instrucciones de Ejecución
 ### 8.1. Requisitos Previos
 ```text
