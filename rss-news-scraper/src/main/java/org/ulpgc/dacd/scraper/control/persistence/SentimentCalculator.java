@@ -13,7 +13,7 @@ public class SentimentCalculator {
     private final HashMap<String, Double> sentimentCache;
 
     public SentimentCalculator(){
-        String sentimentToken = TokenLoader.loadKey("hf.api.key.sentiment");
+        String sentimentToken = TokenLoader.loadKey("huggingface.api.token");
         this.sentimentClient = new HuggingFaceClient(sentimentToken);
         this.sentimentParser = new SentimentParser();
         this.sentimentCache = new HashMap<>();

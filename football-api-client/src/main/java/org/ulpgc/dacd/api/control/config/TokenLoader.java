@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.scraper.control.config;
+package org.ulpgc.dacd.api.control.config;
 
 import java.io.FileInputStream;
 import java.io.IOException;

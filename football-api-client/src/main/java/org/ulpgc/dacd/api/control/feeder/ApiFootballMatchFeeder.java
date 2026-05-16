@@ -1,14 +1,14 @@
 package org.ulpgc.dacd.api.control.feeder;
 
+import org.ulpgc.dacd.api.control.config.TokenLoader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-
 public class ApiFootballMatchFeeder implements FootballMatchFeeder {
-    private static final String API_TOKEN = System.getenv("API_TOKEN");
+    private static final String API_TOKEN = TokenLoader.loadKey("football.api.token");
     private static final String BASE_URL = "https://api.football-data.org/v4/competitions/2014/";
     private final HttpClient client = HttpClient.newHttpClient();
 
@@ -43,4 +43,3 @@ public class ApiFootballMatchFeeder implements FootballMatchFeeder {
         }
     }
 }
-

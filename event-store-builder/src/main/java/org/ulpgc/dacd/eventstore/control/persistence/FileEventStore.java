@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -35,11 +37,12 @@ public class FileEventStore implements EventStore {
                 topic + File.separator +
                 ss;
 
-        File directory = new File(directoryPath);
-        if (directory.exists() && directory.mkdirs()) {
+        try {
+            Files.createDirectories(Paths.get(directoryPath));
             return directoryPath + File.separator + formattedDate + ".events";
+        } catch (IOException e) {
+            throw new RuntimeException("The directory could not be created: " + directoryPath, e);
         }
-        throw new RuntimeException("The directory could not be created: " + directoryPath);
     }
 
     private void writeToDisk(String filePath, String content) {
