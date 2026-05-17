@@ -21,12 +21,12 @@ public class SourceSentimentQuery {
         this.dbManager = dbManager;
     }
 
-    public JsonArray execute(String team) {
+    public JsonArray execute(String teamName) {
         JsonArray results = new JsonArray();
-        try (Connection conn = dbManager.connect();
-             PreparedStatement preparedStatement = conn.prepareStatement(SQL_QUERY)) {
+        try (Connection connection = dbManager.connect();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_QUERY)) {
 
-            preparedStatement.setString(1, team);
+            preparedStatement.setString(1, teamName);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     JsonObject point = new JsonObject();
@@ -36,7 +36,7 @@ public class SourceSentimentQuery {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error in RadarQuery: " + e.getMessage());
+            System.err.println("Error in SourceSentimentQuery: " + e.getMessage());
         }
         return results;
     }

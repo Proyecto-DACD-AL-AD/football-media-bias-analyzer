@@ -1,5 +1,6 @@
 package org.ulpgc.dacd.scraper.control.feeder;
 
+import com.google.gson.Gson;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,7 +25,7 @@ public class RssScraper implements NewsScraper {
         try (java.io.Reader reader = new java.io.InputStreamReader(
                 java.util.Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream(configFilePath)))) {
 
-            com.google.gson.Gson gson = new com.google.gson.Gson();
+            Gson gson = new Gson();
             FeederConfig config = gson.fromJson(reader, FeederConfig.class);
 
             this.baseUrl = config.baseUrl();
