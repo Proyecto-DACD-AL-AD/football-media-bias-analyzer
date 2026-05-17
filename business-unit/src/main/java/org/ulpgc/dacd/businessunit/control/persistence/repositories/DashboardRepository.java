@@ -20,19 +20,19 @@ public class DashboardRepository {
         this.globalStatsQuery = new GlobalStatsQuery(dbManager);
     }
 
-    public JsonArray getThermometerData(String team) {
-        return teamEvolutionQuery.execute(team);
+    public JsonArray getTeamEvolutionData(String teamName) {
+        return teamEvolutionQuery.execute(teamName);
     }
 
-    public JsonArray getRadarData(String team) {
-        return sourceSentimentQuery.execute(team);
+    public JsonArray getSourceSentimentData(String teamName) {
+        return sourceSentimentQuery.execute(teamName);
     }
 
-    public JsonArray getScatterData(String team) {
-        return rankSentimentCorrelationQuery.execute(team);
+    public JsonArray getSentimentCorrelationData(String teamName) {
+        return rankSentimentCorrelationQuery.execute(teamName);
     }
 
-    public JsonArray getGlobalStats() {
+    public JsonArray getGlobalStatsData() {
         return globalStatsQuery.execute();
     }
 }
