@@ -17,7 +17,7 @@
 El objetivo principal de este proyecto es responder a preguntas clave mediante datos objetivos: ¿Qué periódicos castigan más a ciertos equipos? ¿Qué clubes tienen mayor repercusión mediática? ¿Cómo afecta la racha de victorias o derrotas de un equipo al sentimiento de las noticias que se publican sobre él? A través de la recolección de datos deportivos y noticias, la aplicación cruza el rendimiento en el campo con el trato periodístico para revelar posibles tendencias o favoritismos.
 
 ## 2. Arquitectura del Sistema
-El proyecto sigue una arquitectura orientada a eventos basada en el modelo **Kappa**. Se ha elegido esta arquitectura porque todo el procesamiento de datos se realiza a través de un único flujo continuo de eventos (stream processing), prescindiendo de una capa *batch* separada. El estado del sistema se construye procesando los eventos en tiempo real, y si es necesario regenerar la información, se re-procesan los eventos históricos almacenados.
+El proyecto implementa una arquitectura Lambda con procesamiento unificado. A nivel de infraestructura, el sistema mantiene la resiliencia del modelo Lambda separando la ingesta en dos vías físicas: una capa de almacenamiento para el histórico (archivos estáticos .events leídos mediante un EventReader) y una capa de velocidad para el tiempo real (conectada a ActiveMQ mediante la clase Subscriber). Sin embargo, a nivel de procesamiento se adopta la filosofía del modelo Kappa: en lugar de programar procesos analíticos batch pesados de forma paralela, el histórico se regenera simulando un flujo continuo de eventos (stream replay) que atraviesa exactamente la misma lógica de negocio y tubería de datos (RepositoryController) que los mensajes en vivo. Esta decisión de diseño híbrida nos permite disfrutar de un almacenamiento persistente y económico para el pasado, al mismo tiempo que respetamos el principio DRY (Don't Repeat Yourself) al no duplicar el código de procesamiento antes de volcar los resultados en el Datamart final.
 
 ![Arquitectura del Sistema](documentation/images/system-architecture.png)
 
@@ -52,7 +52,6 @@ Son los módulos encargados de la recolección continua de datos desde fuentes e
 
 ![Diagrama de clases](documentation/images/news-scraper.jpeg)
 
-(...)
 
 ### 4.2. Event Store Builder (Subscriber histórico)
 Este módulo se suscribe a todos los tópicos del broker y persiste los eventos en formato crudo (`JSON`) dentro de un almacenamiento local. Actúa como nuestra fuente de verdad absoluta (Event Sourcing) en caso de que sea necesario regenerar el estado de la aplicación.
@@ -60,7 +59,7 @@ Este módulo se suscribe a todos los tópicos del broker y persiste los eventos 
 ![Diagrama de clases](documentation/images/event-store.jpeg)
 
 ### 4.3. Business Unit (Datamart y API REST)
-El corazón del análisis. Este módulo consume los eventos (en tiempo real o en diferido), los procesa y construye un Datamart optimizado en SQLite. Además, expone la información a través de una API REST que alimenta el Dashboard visual.
+El corazón del análisis. Este módulo consume los eventos (en tiempo real o en diferido), los procesa y construye un Datamart optimizado en SQLite. Además, expone la información a través de una API REST que alimenta el Dashboard visual. Este diagrama constituye una versión bastante simplificada del módulo donde se aprecian los principios de diseño más importantes.
 
 ![Diagrama de clases](documentation/images/business-unit.jpeg)
 
@@ -163,9 +162,11 @@ Guarda el histórico de partidos de LaLiga. Nos permite acceder tanto a todos lo
 
 
 ## 7. Principios y Patrones de Diseño
-El desarrollo se ha guiado por los principios SOLID, buscando un código limpio, modular y mantenible. Destacan los siguientes patrones de diseño:
+El desarrollo se ha guiado por los principios SOLID, buscando un código limpio, modular y mantenible. Destacan los siguientes principios y patrones de diseño:
 
 - **Publisher/Subscriber**: Implementado transversalmente con ActiveMQ y JMS para desacoplar la recolección de la lógica de negocio.
+
+- **Command Query Responsibility Separation**: Implementado en el módulo `business-unit`, separando la lógica de escritura de la lógica de lectura.
 
 - **Patrón Repository / DAO**: Visible en clases como SqlRepository, NewsRepository y EventRepository. Abstrae la lógica de acceso a datos (SQLite), aislando la capa de dominio de los detalles de persistencia.
 
@@ -174,6 +175,8 @@ El desarrollo se ha guiado por los principios SOLID, buscando un código limpio,
 - **MVC / API Controller**: Separación clara en la Business Unit entre las rutas de la API (DashboardApi), los controladores lógicos y las vistas (archivos estáticos HTML/JS).
 
 - **Monitorización y Trazabilidad (Logging):** Como pilar fundamental de la monitorización del sistema, se ha implementado un registro de *Logs* unificado en todos los módulos. Todos los mensajes están estandarizados y redactados en inglés. Esta práctica responde a la necesidad crítica de saber "¿qué ha ocurrido?" en tiempo de ejecución, permitiéndonos detectar fallos, entender el estado de la aplicación y facilitar enormemente la depuración ante posibles problemas en producción. Se han utilizado diferentes niveles de severidad (`INFO`, `WARN`, `ERROR`, etc.) siguiendo las mejores prácticas para no saturar la salida y registrar solo la información histórica relevante.
+
+- **Interface Segregation Principle**: De entre todos los principios SOLID aplicados, este se aprecia claramente en el módulo `business-unit`, concretamente en las interfaces `SqlRepository` y `EventRepository`. 
 
 ## 8. Instrucciones de Ejecución
 ### 8.1. Requisitos Previos
