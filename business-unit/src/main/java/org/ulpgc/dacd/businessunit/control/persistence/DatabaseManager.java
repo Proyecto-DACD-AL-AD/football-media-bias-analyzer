@@ -5,6 +5,7 @@ import org.ulpgc.dacd.businessunit.control.persistence.repositories.SqlRepositor
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 public class DatabaseManager {
     private final String dbPath;
@@ -17,7 +18,7 @@ public class DatabaseManager {
         return DriverManager.getConnection(dbPath);
     }
 
-    public void initialize(java.util.List<SqlRepository> repositories) {
+    public void initialize(List<SqlRepository> repositories) {
         repositories.forEach(SqlRepository::initTables);
     }
 }

@@ -28,10 +28,10 @@ public class DashboardApi {
         }).start(apiPort);
 
         app.get("/api/teams", context -> renderJson(context, teamsProvider.getTeams()));
-        app.get("/api/thermometer", context -> handleTeamQuery(context, repository::getThermometerData));
-        app.get("/api/radar", context -> handleTeamQuery(context, repository::getRadarData));
-        app.get("/api/scatter", context -> handleTeamQuery(context, repository::getScatterData));
-        app.get("/api/global-stats", context -> renderJson(context, repository.getGlobalStats()));
+        app.get("/api/thermometer", context -> handleTeamQuery(context, repository::getTeamEvolutionData));
+        app.get("/api/radar", context -> handleTeamQuery(context, repository::getSourceSentimentData));
+        app.get("/api/scatter", context -> handleTeamQuery(context, repository::getSentimentCorrelationData));
+        app.get("/api/global-stats", context -> renderJson(context, repository.getGlobalStatsData()));
     }
 
     private void handleTeamQuery(Context context, java.util.function.Function<String, Object> queryProvider) {

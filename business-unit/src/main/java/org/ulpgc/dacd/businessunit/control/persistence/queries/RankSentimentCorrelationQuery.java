@@ -24,15 +24,15 @@ public class RankSentimentCorrelationQuery {
         this.dbManager = dbManager;
     }
 
-    public JsonArray execute(String team) {
+    public JsonArray execute(String teamName) {
         JsonArray results = new JsonArray();
-        try (Connection conn = dbManager.connect();
-             PreparedStatement preparedStatement = conn.prepareStatement(SQL_QUERY)) {
+        try (Connection connection = dbManager.connect();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_QUERY)) {
 
-            preparedStatement.setString(1, team);
-            preparedStatement.setString(2, team);
-            preparedStatement.setString(3, team);
-            preparedStatement.setString(4, team);
+            preparedStatement.setString(1, teamName);
+            preparedStatement.setString(2, teamName);
+            preparedStatement.setString(3, teamName);
+            preparedStatement.setString(4, teamName);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -44,7 +44,7 @@ public class RankSentimentCorrelationQuery {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error in ScatterQuery: " + e.getMessage());
+            System.err.println("Error in SentimentCorrelationQuery: " + e.getMessage());
         }
         return results;
     }
