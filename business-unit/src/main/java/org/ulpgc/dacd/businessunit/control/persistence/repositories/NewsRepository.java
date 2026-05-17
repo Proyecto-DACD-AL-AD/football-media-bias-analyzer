@@ -44,8 +44,8 @@ public class NewsRepository implements SqlRepository {
 
     @Override
     public void initTables() {
-        try (Connection conn = dbManager.connect();
-             Statement statement = conn.createStatement()) {
+        try (Connection connection = dbManager.connect();
+             Statement statement = connection.createStatement()) {
             statement.execute(CREATE_TABLE_PROCESSED_NEWS);
             statement.execute(CREATE_TABLE_DAILY_SENTIMENT);
         } catch (SQLException e) {

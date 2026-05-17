@@ -44,8 +44,8 @@ public class MatchesRepository implements SqlRepository {
 
     @Override
     public void save(JsonObject matchJson) {
-        try (Connection conn = dbManager.connect();
-             PreparedStatement preparedStatement = conn.prepareStatement(INSERT_MATCH_SQL)) {
+        try (Connection connection = dbManager.connect();
+             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_MATCH_SQL)) {
             preparedStatement.setString(1, matchJson.get("date").getAsString());
             preparedStatement.setInt(2, matchJson.get("matchday").getAsInt());
             preparedStatement.setString(3, matchJson.get("homeTeam").getAsString());
