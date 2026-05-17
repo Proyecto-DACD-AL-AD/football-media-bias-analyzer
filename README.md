@@ -19,7 +19,7 @@ El objetivo principal de este proyecto es responder a preguntas clave mediante d
 ## 2. Arquitectura del Sistema
 El proyecto sigue una arquitectura orientada a eventos basada en el modelo **Kappa**. Se ha elegido esta arquitectura porque todo el procesamiento de datos se realiza a través de un único flujo continuo de eventos (stream processing), prescindiendo de una capa *batch* separada. El estado del sistema se construye procesando los eventos en tiempo real, y si es necesario regenerar la información, se re-procesan los eventos históricos almacenados.
 
-![Arquitectura del Sistema](ruta-a-la-imagen-arquitectura.png)
+![Arquitectura del Sistema](documentation/images/football-api.eg)
 
 ## 3. Estructura del Proyecto
 Para mantener el código desacoplado y organizado siguiendo las especificaciones de los Sprints, el repositorio se divide en los siguientes directorios principales:
@@ -46,23 +46,23 @@ Son los módulos encargados de la recolección continua de datos desde fuentes e
 
 - `football-api-client`: Extrae datos sobre jornadas, partidos y resultados.
 
-![Diagrama de clases](ruta-a-la-imagen-arquitectura.png)
+![Diagrama de clases](documentation/images/football-api.jpeg)
 
 - `rss-news-scraper`: Lee los canales RSS, procesa el texto e interactúa con el modelo de Hugging Face para determinar el análisis de sentimiento antes de publicar el evento.
 
-![Diagrama de clases](ruta-a-la-imagen-arquitectura.png)
+![Diagrama de clases](documentation/images/news-scraper.jpeg)
 
 (...)
 
 ### 4.2. Event Store Builder (Subscriber histórico)
 Este módulo se suscribe a todos los tópicos del broker y persiste los eventos en formato crudo (`JSON`) dentro de un almacenamiento local. Actúa como nuestra fuente de verdad absoluta (Event Sourcing) en caso de que sea necesario regenerar el estado de la aplicación.
 
-![Diagrama de clases](ruta-a-la-imagen-arquitectura.png)
+![Diagrama de clases](documentation/images/event-store.jpeg)
 
 ### 4.3. Business Unit (Datamart y API REST)
 El corazón del análisis. Este módulo consume los eventos (en tiempo real o en diferido), los procesa y construye un Datamart optimizado en SQLite. Además, expone la información a través de una API REST que alimenta el Dashboard visual.
 
-![Diagrama de clases](ruta-a-la-imagen-arquitectura.png)
+![Diagrama de clases](documentation/images/business-unit.jpeg)
 
 
 ## 5. Fuentes de Datos
