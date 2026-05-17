@@ -151,10 +151,10 @@ Guarda el histórico de partidos de LaLiga. Nos permite acceder tanto a todos lo
 
 | Campo | Tipo | Descripción |
 | :--- | :--- | :--- |
-| **date** | TEXT | Fecha exacta del encuentro (Formato ISO 8601). |
+| **date** | TEXT (PK) | Fecha exacta del encuentro (Formato ISO 8601). |
 | **matchday** | INTEGER | Número de la jornada de competición. |
-| **home_team** | TEXT | Nombre del equipo local. |
-| **away_team** | TEXT | Nombre del equipo visitante. |
+| **home_team** | TEXT (PK) | Nombre del equipo local. |
+| **away_team** | TEXT (PK)  | Nombre del equipo visitante. |
 | **home_goals** | INTEGER | Goles anotados por el equipo local. |
 | **away_goals** | INTEGER | Goles anotados por el equipo visitante. |
 | **home_rank** | INTEGER | Posición en la clasificación del local tras el partido. |
