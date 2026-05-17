@@ -19,7 +19,7 @@ El objetivo principal de este proyecto es responder a preguntas clave mediante d
 ## 2. Arquitectura del Sistema
 El proyecto sigue una arquitectura orientada a eventos basada en el modelo **Kappa**. Se ha elegido esta arquitectura porque todo el procesamiento de datos se realiza a través de un único flujo continuo de eventos (stream processing), prescindiendo de una capa *batch* separada. El estado del sistema se construye procesando los eventos en tiempo real, y si es necesario regenerar la información, se re-procesan los eventos históricos almacenados.
 
-![Arquitectura del Sistema](documentation/images/football-api.eg)
+![Arquitectura del Sistema](documentation/images/system-architecture.png)
 
 ## 3. Estructura del Proyecto
 Para mantener el código desacoplado y organizado siguiendo las especificaciones de los Sprints, el repositorio se divide en los siguientes directorios principales:
