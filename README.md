@@ -174,7 +174,9 @@ El desarrollo se ha guiado por los principios SOLID, buscando un código limpio,
 
 - **Monitorización y Trazabilidad (Logging):** Como pilar fundamental de la monitorización del sistema, se ha implementado un registro de *Logs* unificado en todos los módulos. Todos los mensajes están estandarizados y redactados en inglés. Esta práctica responde a la necesidad crítica de saber "¿qué ha ocurrido?" en tiempo de ejecución, permitiéndonos detectar fallos, entender el estado de la aplicación y facilitar enormemente la depuración ante posibles problemas en producción. Se han utilizado diferentes niveles de severidad (`INFO`, `WARN`, `ERROR`, etc.) siguiendo las mejores prácticas para no saturar la salida y registrar solo la información histórica relevante.
 
-- **Interface Segregation Principle**: De entre todos los principios SOLID aplicados, este se aprecia claramente en el módulo `business-unit`, concretamente en las interfaces `SqlRepository` y `EventRepository`. 
+- **Interface Segregation Principle**: De entre todos los principios SOLID aplicados, este se aprecia claramente en el módulo `business-unit`, concretamente en las interfaces `SqlRepository` y `EventRepository`.
+
+- **Control de Versiones (GitFlow):** Se ha seguido un flujo de trabajo estricto basado en la metodología GitFlow para organizar el código y el trabajo en equipo. Todo el desarrollo se ha aislado en ramas independientes empleando prefijos semánticos (`feat/` para nuevas características, `fix/` para corrección de errores, etc.) que se han integrado exclusivamente sobre la rama `develop`. Adicionalmente, todos los mensajes de commit han sido estandarizados y redactados íntegramente en inglés.
 
 ## 8. Instrucciones de Ejecución
 ### 8.1. Requisitos Previos
