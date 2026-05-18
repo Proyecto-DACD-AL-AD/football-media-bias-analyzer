@@ -215,6 +215,8 @@ Para facilitar la revisión y evaluar la evolución del proyecto, se ha creado u
 - `sprint-2`: Integración de la arquitectura Publisher/Subscriber con ActiveMQ y la creación del Event Store.
 
 - `sprint-3`: Estado final del proyecto con la incorporación de la Business Unit, el Datamart analítico y la interfaz de usuario.
+  
+- `v1.0.0`: Versión funcional del proyecto con toda la documentación necesaria, lista para presentar, relacionada con el primer *release* de la aplicación.
 
 ## 9. Ejemplos de Uso
 <img width="1918" height="1075" alt="image" src="https://github.com/user-attachments/assets/c90b2000-997c-4198-9947-09d5232022da" />
