@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Media Bias - Stats</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background-color: #0d1117; color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh; display: flex; flex-direction: column;
+        }
+        header {
+            height: 60px; background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex; align-items: center;
+            padding: 10px 25px; gap: 35px; box-sizing: border-box;
+        }
+        header h1 { font-size: 1.2rem; margin: 0; color: #58a6ff; text-transform: uppercase; letter-spacing: 1px; }
+        nav { display: flex; gap: 25px; align-items: center; }
+        nav a { text-decoration: none; font-size: 0.95rem; color: #8b949e; transition: all 0.3s ease; padding: 5px 0; }
+        nav a:hover { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
+        nav a.active { color: #58a6ff; font-weight: bold; }
+
+        .header-right { margin-left: auto; display: flex; align-items: center;}
+
+        .lang-btn {
+            background: none; border: none;
+            padding: 0; cursor: pointer;
+            display: flex; align-items: center;
+            transition: transform 0.2s;
+        }
+        .lang-btn:hover { transform: scale(1.1); }
+        .lang-img {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #30363d;
+        }
+
+        .global-container { flex: 1; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .chart-card { background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; display: flex; flex-direction: column; position: relative; }
+        .chart-title { color: #8b949e; font-size: 0.9rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; }
+        .chart-container { flex: 1; width: 100%; }
+        .info-wrapper { position: relative; display: inline-flex; margin-left: 8px; cursor: help; }
+        .info-icon { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #8b949e; color: #8b949e; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+        .info-tooltip { visibility: hidden; opacity: 0; width: 250px; background-color: #0d1117; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 10px; position: absolute; z-index: 100; top: 150%; left: 50%; transform: translateX(-50%); transition: opacity 0.3s; font-size: 0.75rem; pointer-events: none; }
+        .info-wrapper:hover .info-tooltip { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>⚽ Media Bias Analyzer</h1>
+    <nav>
+        <a href="index.html" id="navInd">Vista Individual</a>
+        <a href="global.html" class="active" id="navGlob">Vista Global</a>
+    </nav>
+    <div class="header-right">
+        <button onclick="toggleLang()" class="lang-btn">
+            <img id="langImg" class="lang-img" src="/images/en.png" alt="Language">
+        </button>
+    </div>
+</header>
+
+<div class="global-container">
+    <div class="chart-card">
+        <div class="chart-title">
+            <span id="title1">Cobertura Mediática por Equipo</span>
+            <div class="info-wrapper">
+                <div class="info-icon">i</div>
+                <div class="info-tooltip" id="tip1">Número total de noticias publicadas por equipo, destacando qué equipos dominan el panorama mediático.</div>
+            </div>
+        </div>
+        <div id="barChart" class="chart-container"></div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title">
+            <span id="title2">Frecuencia Semanal de Noticias</span>
+            <div class="info-wrapper">
+                <div class="info-icon">i</div>
+                <div class="info-tooltip" id="tip2">Mapa de calor que muestra el volumen de noticias por día de la semana.</div>
+            </div>
+        </div>
+        <div id="heatmapChart" class="chart-container"></div>
+    </div>
+</div>
+
+<script>
+    let currentLang = 'es';
+    const i18n = {
+        es: {
+            img: '/images/en.png', navInd: 'Vista Individual', navGlob: 'Vista Global',
+            t1: 'Cobertura Mediática por Equipo', tip1: 'Número total de noticias por equipo, destacando qué equipos dominan el panorama mediático.',
+            t2: 'Frecuencia Semanal de Noticias', tip2: 'Mapa de calor que muestra el volumen de noticias por día de la semana.',
+            totalNews: 'Total Noticias', freq: 'Frecuencia', days: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            totalLabel: 'Total'
+        },
+        en: {
+            img: '/images/es.png', navInd: 'Individual View', navGlob: 'Global View',
+            t1: 'Media Coverage by Team', tip1: 'Total number of news articles per team, highlighting which teams dominate the media landscape.',
+            t2: 'Weekly News Frequency', tip2: 'Heatmap showing news volume per day of the week.',
+            totalNews: 'Total News', freq: 'Frequency', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            totalLabel: 'Total'
+        }
+    };
+
+    const teamLogoMap = {
+        "FC Barcelona": "barcelona",
+        "Villarreal CF": "villarreal",
+        "Real Madrid CF": "realmadrid",
+        "Club Atlético de Madrid": "atlmadrid",
+        "RCD Espanyol de Barcelona": "espanyol",
+        "Real Betis Balompié": "betis",
+        "Athletic Club": "athletic",
+        "Getafe CF": "getafe",
+        "Elche CF": "elche",
+        "RC Celta de Vigo": "celta",
+        "Deportivo Alavés": "alaves",
+        "Rayo Vallecano de Madrid": "rayovallecano",
+        "Sevilla FC": "sevilla",
+        "Real Sociedad de Fútbol": "realsociedad",
+        "CA Osasuna": "osasuna",
+        "Valencia CF": "valencia",
+        "RCD Mallorca": "mallorca",
+        "Girona FC": "girona",
+        "Real Oviedo": "realoviedo",
+        "Levante UD": "levante"
+    };
+
+    const richLogos = {};
+    for (const team in teamLogoMap) {
+        richLogos[teamLogoMap[team]] = {
+            height: 30,
+            align: 'center',
+            backgroundColor: {
+                image: '/images/' + teamLogoMap[team] + '.png'
+            }
+        };
+    }
+
+    const barChart = echarts.init(document.getElementById('barChart'), 'dark');
+    const heatmapChart = echarts.init(document.getElementById('heatmapChart'), 'dark');
+
+    function toggleLang() {
+        currentLang = currentLang === 'es' ? 'en' : 'es';
+        document.getElementById('langImg').src = i18n[currentLang].img;
+        document.getElementById('navInd').innerText = i18n[currentLang].navInd;
+        document.getElementById('navGlob').innerText = i18n[currentLang].navGlob;
+        document.getElementById('title1').innerText = i18n[currentLang].t1;
+        document.getElementById('tip1').innerText = i18n[currentLang].tip1;
+        document.getElementById('title2').innerText = i18n[currentLang].t2;
+        document.getElementById('tip2').innerText = i18n[currentLang].tip2;
+        loadGlobalData();
+    }
+
+    window.addEventListener('resize', () => { barChart.resize(); heatmapChart.resize(); });
+
+    async function loadGlobalData() {
+        try {
+            const response = await fetch('http://localhost:8080/api/global-stats');
+            const rawData = await response.json();
+
+            const teamTotals = {};
+            const teamSourceTotals = {};
+            const heatmapAgg = {};
+
+            rawData.forEach(item => {
+                teamTotals[item.team] = (teamTotals[item.team] || 0) + item.count;
+
+                if(!teamSourceTotals[item.team]) {
+                    teamSourceTotals[item.team] = {};
+                }
+                teamSourceTotals[item.team][item.source] = (teamSourceTotals[item.team][item.source] || 0) + item.count;
+
+                const key = item.team + '||' + item.day;
+                heatmapAgg[key] = (heatmapAgg[key] || 0) + item.count;
+            });
+
+            const teams = Object.keys(teamTotals).sort((a, b) => teamTotals[b] - teamTotals[a]);
+            const heatmapPoints = [];
+            let maxNewsCount = 20;
+
+            for (const key in heatmapAgg) {
+                const parts = key.split('||');
+                const teamName = parts[0];
+                const day = parseInt(parts[1]);
+                const teamIdx = teams.indexOf(teamName);
+
+                let adjustedDay = day === 0 ? 6 : day - 1;
+                let c = heatmapAgg[key];
+                heatmapPoints.push([adjustedDay, teamIdx, c]);
+                if (c > maxNewsCount) maxNewsCount = c;
+            }
+
+            barChart.setOption({
+                backgroundColor: 'transparent',
+                grid: { containLabel: true, bottom: '5%' },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        const teamName = params[0].name;
+                        const total = params[0].value;
+                        const sources = teamSourceTotals[teamName] || {};
+
+                        let html = `<strong>${teamName}</strong><br/>${i18n[currentLang].totalLabel}: <b>${total}</b><br/><hr style="border-color:#30363d; margin:5px 0;">`;
+
+                        const sortedSources = Object.keys(sources).sort((a, b) => sources[b] - sources[a]);
+                        sortedSources.forEach(src => {
+                            html += `<div style="display:flex; justify-content:space-between; font-size:12px; gap:15px;"><span>${src}:</span> <strong>${sources[src]}</strong></div>`;
+                        });
+                        return html;
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: teams,
+                    axisLabel: {
+                        interval: 0,
+                        hideOverlap: false,
+                        formatter: function(val) {
+                            const safe = teamLogoMap[val];
+                            return safe ? '{' + safe + '|}' : val;
+                        },
+                        rich: richLogos
+                    }
+                },
+                yAxis: { type: 'value' },
+                series: [{ name: i18n[currentLang].totalNews, type: 'bar', data: teams.map(t => teamTotals[t]), itemStyle: { color: '#58a6ff' } }]
+            });
+
+            heatmapChart.setOption({
+                backgroundColor: 'transparent',
+                grid: { containLabel: true, bottom: '15%' },
+                xAxis: { type: 'category', data: i18n[currentLang].days },
+                yAxis: {
+                    type: 'category',
+                    data: teams,
+                    inverse: true,
+                    axisLabel: {
+                        interval: 0,
+                        hideOverlap: false,
+                        margin: 15,
+                        formatter: function(val) {
+                            const safe = teamLogoMap[val];
+                            return safe ? '{' + safe + '|}' : val;
+                        },
+                        rich: richLogos
+                    }
+                },
+                visualMap: {
+                    min: 0,
+                    max: maxNewsCount,
+                    calculable: true,
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: '0%',
+                    inRange: { color: ['#161b22', '#003d82', '#1f6feb', '#58a6ff', '#a5d6ff'] },
+                    textStyle: { color: '#c9d1d9' }
+                },
+                series: [{ name: i18n[currentLang].freq, type: 'heatmap', data: heatmapPoints }]
+            });
+        } catch (e) { console.error(e); }
+    }
+    loadGlobalData();
+</script>
+</body>
+</html>

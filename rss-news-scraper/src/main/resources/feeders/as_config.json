@@ -1,0 +1,26 @@
+{
+  "sourceName": "AS",
+  "baseUrl": "https://feeds.as.com/mrss-s/list/as/site/as.com/tag/%s_a/",
+  "teamUrlNames": {
+    "FC Barcelona": "fc_barcelona",
+    "Villarreal CF": "villarreal_cf",
+    "Real Madrid CF": "real_madrid",
+    "Club Atlético de Madrid": "atletico_madrid",
+    "RCD Espanyol de Barcelona": "rcd_espanyol",
+    "Real Betis Balompié": "real_betis",
+    "Athletic Club": "athletic",
+    "Getafe CF": "getafe_cf",
+    "Elche CF": "elche_cf",
+    "RC Celta de Vigo": "real_club_celta_de_vigo",
+    "Deportivo Alavés": "deportivo_alaves",
+    "Rayo Vallecano de Madrid": "rayo_vallecano",
+    "Sevilla FC": "sevilla_futbol_club",
+    "Real Sociedad de Fútbol": "real_sociedad",
+    "CA Osasuna": "osasuna",
+    "Valencia CF": "valencia_cf",
+    "RCD Mallorca": "real_mallorca",
+    "Girona FC": "girona_cf",
+    "Real Oviedo": "real_oviedo",
+    "Levante UD": "levante_ud"
+  }
+}

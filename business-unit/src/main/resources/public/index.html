@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Media Bias Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            background-color: #0d1117; color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        header {
+            height: 60px; background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex; align-items: center;
+            padding: 10px 25px; gap: 35px;
+        }
+        header h1 {
+            font-size: 1.2rem; margin: 0; color: #58a6ff;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        nav { display: flex; gap: 25px; align-items: center; }
+        nav a {
+            text-decoration: none; font-size: 0.95rem; color: #8b949e;
+            transition: all 0.3s ease; padding: 5px 0;
+        }
+        nav a:hover { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
+        nav a.active { color: #58a6ff; font-weight: bold; }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .lang-btn {
+            background: none; border: none;
+            padding: 0; cursor: pointer;
+            display: flex; align-items: center;
+            transition: transform 0.2s;
+        }
+        .lang-btn:hover { transform: scale(1.1); }
+        .lang-img {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #30363d;
+        }
+
+        .header-right label { font-size: 0.9rem; color: #8b949e; font-weight: 600; }
+
+        .custom-select-container {
+            position: relative;
+            width: 250px;
+            user-select: none;
+        }
+        .select-trigger {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+        .select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .select-options.show { display: block; }
+        .option-item {
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+        .option-item:hover { background-color: #1f6feb; color: #fff; }
+        .option-logo { width: 30px; height: 30px; object-fit: contain; }
+
+        .dashboard-container {
+            flex: 1; padding: 15px;
+            display: grid; grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr; gap: 15px;
+        }
+        .chart-card {
+            background-color: #161b22; border: 1px solid #30363d;
+            border-radius: 8px; position: relative;
+            padding: 10px; display: flex; flex-direction: column;
+        }
+        .chart-core { grid-column: span 2; }
+        .chart-title {
+            position: absolute; top: 15px; left: 20px;
+            font-size: 0.9rem; color: #8b949e;
+            font-weight: 600; z-index: 10;
+            display: flex; align-items: center;
+        }
+        .chart-container { flex: 1; width: 100%; margin-top: 25px; }
+        .info-wrapper { position: relative; display: inline-flex; margin-left: 8px; cursor: help; }
+        .info-icon {
+            width: 16px; height: 16px; border-radius: 50%;
+            border: 1px solid #8b949e; color: #8b949e;
+            font-size: 10px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .info-wrapper:hover .info-icon { color: #fff; border-color: #58a6ff; background-color: #58a6ff; }
+        .info-tooltip {
+            visibility: hidden; opacity: 0; width: 250px;
+            background-color: #0d1117; color: #c9d1d9;
+            text-align: left; border: 1px solid #30363d;
+            border-radius: 6px; padding: 10px;
+            position: absolute; z-index: 100; top: 150%; left: 50%;
+            transform: translateX(-50%); transition: opacity 0.3s;
+            font-size: 0.75rem; font-weight: normal; pointer-events: none;
+        }
+        .info-wrapper:hover .info-tooltip { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 id="mainTitle">⚽ Media Bias Analyzer</h1>
+    <nav>
+        <a href="index.html" class="active" id="navInd">Vista Individual</a>
+        <a href="global.html" id="navGlob">Vista Global</a>
+    </nav>
+    <div class="header-right">
+        <button onclick="toggleLang()" class="lang-btn">
+            <img id="langImg" class="lang-img" src="/images/en.png" alt="Language">
+        </button>
+        <label id="labelSelect">Seleccionar Equipo:</label>
+        <div class="custom-select-container">
+            <div class="select-trigger" id="selectTrigger">
+                <img src="" class="option-logo" id="selectedLogo" style="display:none">
+                <span id="selectedName">...</span>
+            </div>
+            <div class="select-options" id="selectOptions"></div>
+        </div>
+    </div>
+</header>
+
+<div class="dashboard-container">
+    <div class="chart-card chart-core">
+        <div class="chart-title">
+            <span id="title1">Sentimiento vs Posición en Liga</span>
+            <div class="info-wrapper">
+                <div class="info-icon">i</div>
+                <div class="info-tooltip" id="tip1">Muestra la correlación entre el sentimiento de la prensa y la posición en liga. El tooltip indica resultados (V/E/D).</div>
+            </div>
+        </div>
+        <div id="thermometerChart" class="chart-container"></div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title">
+            <span id="title2">Sesgo por Fuente</span>
+            <div class="info-wrapper">
+                <div class="info-icon">i</div>
+                <div class="info-tooltip" id="tip2">Muestra el sentimiento medio por fuente, ayudando a identificar sesgos de periódicos específicos.</div>
+            </div>
+        </div>
+        <div id="radarChart" class="chart-container"></div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title">
+            <span id="title3">Dispersión Posición vs Sentimiento</span>
+            <div class="info-wrapper">
+                <div class="info-icon">i</div>
+                <div class="info-tooltip" id="tip3">Compara la posición vs sentimiento. Destaca cómo de crítica es la prensa respecto al rendimiento real.</div>
+            </div>
+        </div>
+        <div id="scatterChart" class="chart-container"></div>
+    </div>
+</div>
+
+<script>
+    let currentLang = 'es';
+    let currentTeam = '';
+    const i18n = {
+        es: {
+            img: '/images/en.png', label: 'Seleccionar Equipo:', navInd: 'Vista Individual', navGlob: 'Vista Global',
+            t1: 'Sentimiento vs Posición en Liga', tip1: 'Muestra la correlación entre el sentimiento de la prensa y la posición en liga. El tooltip indica resultados (V/E/D).',
+            t2: 'Sesgo por Fuente', tip2: 'Muestra el sentimiento medio por fuente, ayudando a identificar sesgos de periódicos específicos.',
+            t3: 'Dispersión Posición vs Sentimiento', tip3: 'Compara la posición vs sentimiento. Destaca cómo de crítica es la prensa respecto al rendimiento real.',
+            sent: 'Sentimiento', rank: 'Posición Liga', time: 'Línea de Tiempo', avgSent: 'Sentimiento Medio',
+            date: 'Fecha', sentFor: 'Sentimiento de'
+        },
+        en: {
+            img: '/images/es.png', label: 'Select Team:', navInd: 'Individual View', navGlob: 'Global View',
+            t1: 'Media Sentiment vs League Rank', tip1: 'Displays correlation between media sentiment and league position. Tooltip shows match results (W/D/L).',
+            t2: 'Sentiment Bias by Source', tip2: 'Shows average sentiment score per media source to identify specific newspaper biases.',
+            t3: 'Rank vs Sentiment Scatter', tip3: 'Compares rank vs sentiment. Highlights how critical media is relative to actual performance.',
+            sent: 'Sentiment Score', rank: 'League Rank', time: 'Timeline', avgSent: 'Avg. Sentiment Score',
+            date: 'Date', sentFor: 'Sentiment for'
+        }
+    };
+
+    const teamLogoMap = {
+        "FC Barcelona": "barcelona", "Villarreal CF": "villarreal", "Real Madrid CF": "realmadrid",
+        "Club Atlético de Madrid": "atlmadrid", "RCD Espanyol de Barcelona": "espanyol",
+        "Real Betis Balompié": "betis", "Athletic Club": "athletic", "Getafe CF": "getafe",
+        "Elche CF": "elche", "RC Celta de Vigo": "celta", "Deportivo Alavés": "alaves",
+        "Rayo Vallecano de Madrid": "rayovallecano", "Sevilla FC": "sevilla",
+        "Real Sociedad de Fútbol": "realsociedad", "CA Osasuna": "osasuna",
+        "Valencia CF": "valencia", "RCD Mallorca": "mallorca", "Girona FC": "girona",
+        "Real Oviedo": "realoviedo", "Levante UD": "levante"
+    };
+
+    const thermometerChart = echarts.init(document.getElementById('thermometerChart'), 'dark');
+    const radarChart = echarts.init(document.getElementById('radarChart'), 'dark');
+    const scatterChart = echarts.init(document.getElementById('scatterChart'), 'dark');
+
+    function toggleLang() {
+        currentLang = currentLang === 'es' ? 'en' : 'es';
+        document.getElementById('langImg').src = i18n[currentLang].img;
+        document.getElementById('labelSelect').innerText = i18n[currentLang].label;
+        document.getElementById('navInd').innerText = i18n[currentLang].navInd;
+        document.getElementById('navGlob').innerText = i18n[currentLang].navGlob;
+        document.getElementById('title1').innerText = i18n[currentLang].t1;
+        document.getElementById('tip1').innerText = i18n[currentLang].tip1;
+        document.getElementById('title2').innerText = i18n[currentLang].t2;
+        document.getElementById('tip2').innerText = i18n[currentLang].tip2;
+        document.getElementById('title3').innerText = i18n[currentLang].t3;
+        document.getElementById('tip3').innerText = i18n[currentLang].tip3;
+        if (currentTeam) { loadCharts(currentTeam); }
+    }
+
+    function selectTeam(team) {
+        currentTeam = team;
+        const triggerLogo = document.getElementById('selectedLogo');
+        const triggerName = document.getElementById('selectedName');
+        const safeName = teamLogoMap[team];
+
+        triggerLogo.src = `/images/${safeName}.png`;
+        triggerLogo.style.display = 'block';
+        triggerName.innerText = team;
+
+        document.getElementById('selectOptions').classList.remove('show');
+        loadCharts(team);
+    }
+
+    function loadCharts(team) {
+        loadThermometerData(team);
+        loadRadarData(team);
+        loadScatterData(team);
+    }
+
+    document.getElementById('selectTrigger').addEventListener('click', () => {
+        document.getElementById('selectOptions').classList.toggle('show');
+    });
+
+    window.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select-container')) {
+            document.getElementById('selectOptions').classList.remove('show');
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        thermometerChart.resize(); radarChart.resize(); scatterChart.resize();
+    });
+
+    async function initDashboard() {
+        try {
+            const response = await fetch('http://localhost:8080/api/teams');
+            const teams = await response.json();
+            const optionsContainer = document.getElementById('selectOptions');
+
+            teams.forEach(team => {
+                const div = document.createElement('div');
+                div.className = 'option-item';
+                const safe = teamLogoMap[team];
+                div.innerHTML = `<img src="/images/${safe}.png" class="option-logo"><span>${team}</span>`;
+                div.onclick = () => selectTeam(team);
+                optionsContainer.appendChild(div);
+            });
+
+            const defaultTeam = "Deportivo Alavés";
+            const startTeam = teams.includes(defaultTeam) ? defaultTeam : teams[0];
+            if (startTeam) selectTeam(startTeam);
+
+        } catch (error) { console.error(error); }
+    }
+
+    async function loadThermometerData(team) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/thermometer?team=${encodeURIComponent(team)}`);
+            const data = await response.json();
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis', axisPointer: { type: 'cross' },
+                    formatter: function (params) {
+                        let html = `<div style="margin-bottom:5px;font-weight:bold;">${params[0].axisValue}</div>`;
+                        params.forEach(param => {
+                            let valueStr = '-'; let markerColor = param.color;
+                            if (param.seriesName === i18n[currentLang].rank) {
+                                const rankVal = param.data[1]; const matchResult = param.data[2];
+                                if (rankVal !== null && !isNaN(rankVal)) valueStr = Math.floor(rankVal) + 'º';
+                                if (matchResult === 'WIN') markerColor = '#3fb950';
+                                else if (matchResult === 'DRAW') markerColor = '#8b949e';
+                                else if (matchResult === 'LOSS') markerColor = '#ff7b72';
+                            } else {
+                                if (param.value !== null && !isNaN(param.value)) valueStr = parseFloat(param.value).toFixed(2);
+                            }
+                            const marker = `<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${markerColor};"></span>`;
+                            html += `<div>${marker}${param.seriesName}: <span style="float:right;margin-left:20px;font-weight:bold;">${valueStr}</span></div>`;
+                        });
+                        return html;
+                    }
+                },
+                legend: { data: [i18n[currentLang].avgSent, i18n[currentLang].rank], top: 0, right: 20, textStyle: { color: '#c9d1d9' } },
+                grid: { left: '5%', right: '10%', bottom: '15%', containLabel: true },
+                xAxis: {
+                    type: 'category', data: data.map(item => item.date),
+                    name: i18n[currentLang].time, nameLocation: 'middle', nameGap: 35,
+                    axisLine: { lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e' }
+                },
+                yAxis: [
+                    { type: 'value', name: i18n[currentLang].sent, nameLocation: 'middle', nameGap: 45, min: -1, max: 1, axisLine: { show: true, lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e' }, splitLine: { lineStyle: { color: '#30363d', type: 'dashed' } } },
+                    { type: 'value', name: i18n[currentLang].rank, nameLocation: 'middle', nameGap: 40, nameRotate: 270, min: 1, max: 20, inverse: true, axisLine: { show: true, lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e' }, splitLine: { show: false } }
+                ],
+                series: [
+                    { name: i18n[currentLang].avgSent, type: 'line', smooth: true, connectNulls: true, data: data.map(item => item.sentiment), itemStyle: { color: '#58a6ff' }, areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(88, 166, 255, 0.3)' }, { offset: 1, color: 'rgba(88, 166, 255, 0)' }]) } },
+                    { name: i18n[currentLang].rank, type: 'line', yAxisIndex: 1, connectNulls: true, data: data.map((item, index) => [index, item.rank !== undefined ? item.rank : null, item.match_result || 'NONE']), itemStyle: { color: '#3fb950' }, symbol: 'none', lineStyle: { type: 'dotted', width: 2 } }
+                ]
+            };
+            thermometerChart.setOption(option);
+        } catch (error) {}
+    }
+
+    async function loadRadarData(team) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/radar?team=${encodeURIComponent(team)}`);
+            const data = await response.json();
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'item', valueFormatter: (value) => (value !== null && !isNaN(value)) ? parseFloat(value).toFixed(2) : '-' },
+                radar: {
+                    indicator: data.map(item => ({ name: item.source, max: 1, min: -1 })),
+                    shape: 'polygon', splitNumber: 4, axisName: { color: '#c9d1d9', borderRadius: 3, padding: [3, 5] },
+                    splitArea: { areaStyle: { color: ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)'] } },
+                    splitLine: { lineStyle: { color: '#30363d' } }, axisLine: { lineStyle: { color: '#30363d' } }
+                },
+                series: [{
+                    name: i18n[currentLang].t2, type: 'radar',
+                    data: [{ value: data.map(item => item.sentiment), name: `${i18n[currentLang].sentFor} ${team}`, itemStyle: { color: '#d2a8ff' }, areaStyle: { color: 'rgba(210, 168, 255, 0.4)' }, lineStyle: { width: 2 } }]
+                }]
+            };
+            radarChart.setOption(option);
+        } catch (error) { console.error(error); }
+    }
+
+    async function loadScatterData(team) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/scatter?team=${encodeURIComponent(team)}`);
+            const data = await response.json();
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    formatter: (params) => {
+                        const date = params.value[2] ? params.value[2].split('T')[0] : '-';
+                        const rank = (params.value[0] !== null && !isNaN(params.value[0])) ? Math.floor(params.value[0]) + 'º' : '-';
+                        const sentiment = (params.value[1] !== null && !isNaN(params.value[1])) ? parseFloat(params.value[1]).toFixed(2) : '-';
+                        return `<b>${i18n[currentLang].date}:</b> ${date}<br/><b>${i18n[currentLang].rank}:</b> ${rank}<br/><b>${i18n[currentLang].sent}:</b> ${sentiment}`;
+                    }
+                },
+                grid: { left: '10%', right: '10%', bottom: '15%', containLabel: true },
+                xAxis: { name: i18n[currentLang].rank, nameLocation: 'middle', nameGap: 30, min: 1, max: 20, inverse: true, interval: 1, axisLabel: { color: '#8b949e' } },
+                yAxis: { name: i18n[currentLang].sent, nameLocation: 'middle', nameGap: 40, min: -1, max: 1, axisLabel: { color: '#8b949e' } },
+                series: [{ symbolSize: 15, data: data, type: 'scatter', itemStyle: { color: '#ff7b72', borderColor: '#fff', borderWidth: 1 }, markLine: { silent: true, lineStyle: { type: 'dashed', color: '#8b949e' }, label: { show: false }, data: [ {xAxis: 10.5}, {yAxis: 0} ] } }]
+            };
+            scatterChart.setOption(option);
+        } catch (error) { console.error(error); }
+    }
+    initDashboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "sourceName": "Mundo Deportivo",
+  "baseUrl": "https://www.mundodeportivo.com/feed/rss/futbol/%s/",
+  "teamUrlNames": {
+    "FC Barcelona": "fc-barcelona",
+    "Villarreal CF": "villarreal",
+    "Real Madrid CF": "real-madrid",
+    "Club Atlético de Madrid": "atletico-madrid",
+    "RCD Espanyol de Barcelona": "rcd-espanyol",
+    "Real Betis Balompié": "betis",
+    "Athletic Club": "athletic-bilbao",
+    "Getafe CF": "getafe",
+    "Elche CF": "elche-cf",
+    "RC Celta de Vigo": "celta-vigo",
+    "Deportivo Alavés": "alaves",
+    "Rayo Vallecano de Madrid": "rayo-vallecano",
+    "Sevilla FC": "sevilla",
+    "Real Sociedad de Fútbol": "real-sociedad",
+    "CA Osasuna": "osasuna",
+    "Valencia CF": "valencia",
+    "RCD Mallorca": "mallorca",
+    "Girona FC": "girona-fc",
+    "Real Oviedo": "oviedo",
+    "Levante UD": "levante"
+  }
+}
