@@ -12,7 +12,7 @@ import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;
 import java.io.File;
 
-public class Initializer {
+public class    Initializer {
     private static final int DEFAULT_PORT = 8080;
     private static final String BROKER_URL = "tcp://localhost:61616";
     private static final String CLIENT_ID = "business-unit-client";

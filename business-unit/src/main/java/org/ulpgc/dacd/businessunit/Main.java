@@ -15,7 +15,6 @@ public class Main {
         Initializer initializer = new Initializer();
         try {
             DatabaseManager dbManager = initializer.setupDatabase();
-
             SqlRepository newsRepository = new NewsRepository(dbManager);
             SqlRepository matchesRepository = new MatchesRepository(dbManager);
             dbManager.initialize(List.of(newsRepository, matchesRepository));
@@ -23,16 +22,13 @@ public class Main {
             Connection connection = initializer.setupActiveMQConnection();
 
             RepositoryController repositoryController = new RepositoryController(newsRepository, matchesRepository);
+            DashboardRepository dashboardRepository = new DashboardRepository(dbManager);
             SubscriberController subscriberController = initializer.buildSubscriberController(connection, repositoryController);
+            DashboardApi api = initializer.buildApi(dashboardRepository);
 
             initializer.loadHistoricalData(repositoryController);
-
-            DashboardRepository dashboardRepository = new DashboardRepository(dbManager);
-            DashboardApi api = initializer.buildApi(dashboardRepository);
             api.start();
-
             subscriberController.start();
-
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
