@@ -207,6 +207,15 @@ Para desplegar el proyecto desde cero, los módulos deben levantarse en el sigui
 
 5. **Acceso a la Interfaz**: Abrir cualquier navegador web y acceder a la URL: `http://localhost:8080/index.html`
 
+## ANEXO: Histórico de Sprints (Git Tags)
+Para facilitar la revisión y evaluar la evolución del proyecto, se ha creado un *tag* en Git al término de cada fase. Esto permite situarse en el estado exacto en el que se encontraba la aplicación al dar por concluido cada sprint:
+
+- `sprint-1`: Entrega correspondiente a la captura de datos inicial y almacenamiento base.
+
+- `sprint-2`: Integración de la arquitectura Publisher/Subscriber con ActiveMQ y la creación del Event Store.
+
+- `sprint-3`: Estado final del proyecto con la incorporación de la Business Unit, el Datamart analítico y la interfaz de usuario.
+
 ## 9. Ejemplos de Uso
 <img width="1918" height="1075" alt="image" src="https://github.com/user-attachments/assets/c90b2000-997c-4198-9947-09d5232022da" />
 <img width="1918" height="1078" alt="Captura de pantalla 2026-05-16 131731" src="https://github.com/user-attachments/assets/445a0a5e-0a47-4cb8-aadd-26476df0ea03" />
