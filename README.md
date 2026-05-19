@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>⚽ Sports Media Bias Analyzer</h1>
+  <h1>⚽ Football Media Bias Analyzer</h1>
   <p>
     <strong>Desarrollo de Aplicaciones para Ciencia de Datos</strong><br>
     <em>Universidad de Las Palmas de Gran Canaria (ULPGC)</em>
@@ -12,12 +12,12 @@
 ---
 
 ## 1. Descripción y Propuesta de Valor
-**Sports Media Bias Analyzer** es una aplicación diseñada para visualizar y analizar empíricamente el sesgo deportivo en la prensa española. 
+**Football Media Bias Analyzer** es una aplicación diseñada para visualizar y analizar empíricamente el sesgo deportivo en la prensa española. 
 
 El objetivo principal de este proyecto es responder a preguntas clave mediante datos objetivos: ¿Qué periódicos castigan más a ciertos equipos? ¿Qué clubes tienen mayor repercusión mediática? ¿Cómo afecta la racha de victorias o derrotas de un equipo al sentimiento de las noticias que se publican sobre él? A través de la recolección de datos deportivos y noticias, la aplicación cruza el rendimiento en el campo con el trato periodístico para revelar posibles tendencias o favoritismos.
 
 ## 2. Arquitectura del Sistema
-El proyecto implementa una arquitectura Lambda con procesamiento unificado. A nivel de infraestructura, el sistema mantiene la resiliencia del modelo Lambda separando la ingesta en dos vías físicas: una capa de almacenamiento para el histórico (archivos estáticos .events leídos mediante un EventReader) y una capa de velocidad para el tiempo real (conectada a ActiveMQ mediante la clase Subscriber). Sin embargo, a nivel de procesamiento se adopta la filosofía del modelo Kappa: en lugar de programar procesos analíticos batch pesados de forma paralela, el histórico se regenera simulando un flujo continuo de eventos (stream replay) que atraviesa exactamente la misma lógica de negocio y tubería de datos (RepositoryController) que los mensajes en vivo. Esta decisión de diseño híbrida nos permite disfrutar de un almacenamiento persistente y económico para el pasado, al mismo tiempo que respetamos el principio DRY (Don't Repeat Yourself) al no duplicar el código de procesamiento antes de volcar los resultados en el Datamart final.
+El proyecto implementa una arquitectura Lambda, ya que el datamart unifica el procesamiento de datos históricos y en tiempo real mediante dos capas diferenciadas. Por un lado, la capa de lote (Batch Layer) procesa los datos históricos almacenados en disco. Por otro lado, la capa de velocidad (Speed Layer) consume y procesa los eventos en tiempo real directamente desde el bróker de mensajería (ActiveMQ), garantizando así baja latencia y consistencia en el destino final. 
 
 ![Arquitectura del Sistema](documentation/images/system-architecture.png)
 
@@ -25,7 +25,7 @@ El proyecto implementa una arquitectura Lambda con procesamiento unificado. A ni
 Para mantener el código desacoplado y organizado siguiendo las especificaciones de los Sprints, el repositorio se divide en los siguientes directorios principales:
 
 ```text
-sports-media-bias-analyzer/
+football-media-bias-analyzer/
 ├── football-api-client/    # Feeder: Ingesta de datos de resultados deportivos
 ├── rss-news-scraper/       # Feeder: Ingesta y análisis de sentimiento de noticias
 ├── event-store-builder/    # Suscriptor: Almacenamiento histórico de eventos en crudo
