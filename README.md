@@ -194,6 +194,8 @@ El contenido debe seguir esta estructura exacta:
 huggingface.api.token=TOKEN_DE_HUGGINGFACE
 football.api.token=TOKEN_DE_API_FOOTBALL
 ```
+
+Enlace a la API: https://www.football-data.org/client/login
 ### 8.3. Orden de Ejecución
 Para desplegar el proyecto desde cero, los módulos deben levantarse en el siguiente orden estricto:
 
