@@ -50,7 +50,7 @@ Son los módulos encargados de la recolección continua de datos desde fuentes e
 
 - `rss-news-scraper`: Lee los canales RSS, procesa el texto e interactúa con el modelo de Hugging Face para determinar el análisis de sentimiento antes de publicar el evento.
 
-![Diagrama de clases](documentation/images/news-scraper.jpeg)
+![Diagrama de clases](documentation/images/news-scraper.png)
 
 
 ### 4.2. Event Store Builder (Subscriber histórico)
@@ -195,8 +195,8 @@ huggingface.api.token=TOKEN_DE_HUGGINGFACE
 football.api.token=TOKEN_DE_API_FOOTBALL
 ```
 
-Enlace a la API de fútbol: https://www.football-data.org/client/login
-Enlace a Hugging Face:https://huggingface.co/
+- Enlace a la *API de fútbol*: https://www.football-data.org/client/login  
+- Enlace a *Hugging Face*: https://huggingface.co/
 ### 8.3. Orden de Ejecución
 Para desplegar el proyecto desde cero, los módulos deben levantarse en el siguiente orden estricto:
 
