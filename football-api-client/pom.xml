@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>org.ulpgc.dacd</groupId>
-        <artifactId>sports-media-bias-analyzer</artifactId>
+        <artifactId>football-media-bias-analyzer</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
