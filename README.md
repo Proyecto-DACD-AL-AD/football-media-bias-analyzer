@@ -195,7 +195,8 @@ huggingface.api.token=TOKEN_DE_HUGGINGFACE
 football.api.token=TOKEN_DE_API_FOOTBALL
 ```
 
-Enlace a la API: https://www.football-data.org/client/login
+Enlace a la API de fútbol: https://www.football-data.org/client/login
+Enlace a Hugging Face:https://huggingface.co/
 ### 8.3. Orden de Ejecución
 Para desplegar el proyecto desde cero, los módulos deben levantarse en el siguiente orden estricto:
 
